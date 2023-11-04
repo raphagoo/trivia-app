@@ -7,16 +7,18 @@ import { AxiosResponse } from 'axios';
 const state = {all: []};
 
 const actions = {
-    getAllTags({ commit }: { commit: Commit }) {
-        commit('getAllTagsRequest');
-        api.get('/totals-per-tag', {
-            headers: {'Accept': 'application/json'},
-        }).then(response => {
-            Promise.resolve(response)
-            commit('getAllTagsSuccess', response)
-        }).catch(error => {
-            Promise.reject(error)
-            commit('getAllTagsError', error)
+    getAllTags({ commit }: { commit: Commit }, difficulties: String = 'easy,medium,hard') {
+        return new Promise(function(resolve, reject){
+            commit('getAllTagsRequest');
+            api.get('/totals-per-tag?difficulties=' + difficulties, {
+                headers: {'Accept': 'application/json'},
+            }).then(response => {
+                commit('getAllTagsSuccess', response)
+                resolve(response)
+            }).catch(error => {
+                commit('getAllTagsError', error)
+                reject(error)
+            })
         })
     }
 };
@@ -28,8 +30,12 @@ const mutations = {
     getAllTagsSuccess(state: tagState, response: AxiosResponse) {
         const asArray = Object.entries(response.data);
         const filtered = asArray.filter(([key, value]) => value >= 50);
-        const justStrings = Object.fromEntries(filtered);
-        state.all = justStrings;
+        filtered.sort();
+        const result = filtered.map(([category, value]) => ({
+            category,
+            value,
+        }));
+        state.all = result;
     },
     getAllTagsError(state: tagState, error: AxiosResponse) {
         consoleLogger.error(error)

@@ -8,10 +8,6 @@ import App from './App.vue'
 
 const vuetify = createVuetify()
 
-const VERSION = '2.1.0'
-
-logger.info('main.js VERSION', VERSION); // eslint-disable-line no-undef
-
 const app = createApp(App)
 app.use(router)
 app.use(store)

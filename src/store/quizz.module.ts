@@ -7,18 +7,32 @@ import { AxiosResponse } from 'axios';
 const state = {};
 
 const actions = {
-    generateQuizz({ commit }: {commit: Commit}, tags: String) {
-        commit('generateQuizzRequest');
-        api.get('/questions?categories=' + tags, {
-            headers: {'Accept': 'application/json'},
-        }).then(response => {
-            Promise.resolve(response)
-            commit('generateQuizzSuccess', response)
-        }).catch(error => {
-            Promise.reject(error)
-            commit('generateQuizzError', error)
+    generateQuizz({ commit }: {commit: Commit}, {tags = '', difficulties = 'easy,medium,hard'}: {tags: String, difficulties: String}) {
+        return new Promise(function(resolve, reject){
+            commit('generateQuizzRequest');
+            let url = '/questions?limit=3&difficulties=' + difficulties
+            if(tags !== '') {
+                url += '&tags=' + tags
+            }
+            api.get(url, {
+                headers: {'Accept': 'application/json'},
+            }).then(response => {
+                commit('generateQuizzSuccess', response)
+                resolve(response)
+            }).catch(error => {
+                commit('generateQuizzError', error)
+                reject(error)
+            })
         })
-    }
+    },
+
+    nextQuestion({commit}: {commit:Commit}) {
+        commit('nextQuestion');
+    },
+
+    endQuizz({commit}: {commit:Commit}) {
+        commit('resetActiveIndex');
+    },
 };
 
 const mutations = {
@@ -26,20 +40,41 @@ const mutations = {
         state.generated = []
     },
     generateQuizzSuccess(state: quizzState, response: AxiosResponse) {
-        response.data.forEach(question => {
+        response.data.forEach((question: Question) => {
+            switch(question.difficulty) {
+                case 'easy':
+                    question.points = 10
+                    question.difficultyColorClass = 'text-green'
+                    break;
+                case 'medium':
+                    question.points = 20
+                    question.difficultyColorClass = 'text-orange'
+                    break;
+                case 'hard':
+                    question.points = 30
+                    question.difficultyColorClass = 'text-red'
+                    break;
+            }
             question.incorrectAnswers.push(question.correctAnswer)
             question.answers = shuffle(question.incorrectAnswers)
         });
         state.generated = response.data
-        state.active = response.data[0]
+        state.activeIndex = 0
+        state.userScore = 0
     },
     generateQuizzError(state: quizzState, error: AxiosResponse) {
         consoleLogger.error(error)
         state.generated = [];
+    },
+    nextQuestion(state: quizzState) {
+        state.activeIndex++;
+    },
+    resetActiveIndex(state: quizzState){
+        state.activeIndex = 0;
     }
 };
 
-function shuffle(array: Array) {
+function shuffle(array: Array<Question>) {
     let currentIndex = array.length,  randomIndex;
 
     // While there remain elements to shuffle.

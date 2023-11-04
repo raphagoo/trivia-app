@@ -9,6 +9,7 @@
         "test": "jest ./src/tests"
     },
     "dependencies": {
+        "@chenfengyuan/vue-countdown": "^2.1.2",
         "@mdi/font": "7.0.96",
         "axios": "^0.27.2",
         "roboto-fontface": "*",

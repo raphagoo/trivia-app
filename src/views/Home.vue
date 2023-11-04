@@ -1,20 +1,22 @@
 <template>
-    <v-row>
-        <v-col
-            cols="9">
-            <v-list lines="two">
-                <v-list-item class="ma-3 w-50 bg-primary" v-for="(value, name, index) in this.tag.all" :key="index">
-                    <v-list-item-title>{{ name }}</v-list-item-title>
-                    <v-list-item-subtitle>{{ value }} questions available</v-list-item-subtitle>
-                    <v-list-item-action end>
-                        <v-checkbox-btn :value="name" v-model="this.selected"></v-checkbox-btn>
-                    </v-list-item-action>
-                </v-list-item>
-            </v-list>
+    <v-row class="w-75 d-flex">
+        <v-col cols="9">
+            <v-select
+            v-model="selected"
+            :items="tag.all"
+            :item-props="itemProps"
+            item-value="category"
+            label="Select categories"
+            multiple
+
+            persistent-hint
+            ></v-select>
+            <v-checkbox class="d-flex w-25" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
         </v-col>
-        <v-col cols="3">
-            Selected : {{ selected }}
-            <v-btn @click="getQuizz(this.selected)">Create Quizz</v-btn>
+    </v-row>
+    <v-row class="w-25 d-flex">
+        <v-col cols="12">
+            <v-btn @click="getQuizz(selected, selectedDifficulties)">Create Quizz</v-btn>
         </v-col>
     </v-row>
 </template>
@@ -25,30 +27,58 @@ export default {
     name: 'home',
     components: {
     },
+    watch: {
+        selectedDifficulties() {
+            if(this.selectedDifficulties.length === 0){
+
+            } else {
+                this.selected = [];
+                this.getAllTags(this.selectedDifficulties)
+            }
+        }
+    },
     methods: {
+        itemProps (item: Tag) {
+            return {
+                title: this.beautify(item.category),
+                subtitle: item.value + ' questions available',
+            }
+        },
         ...mapActions('tag', {
             getAllTags: 'getAllTags',
         }),
         ...mapActions('quizz', {
             generateQuizz: 'generateQuizz',
         }),
-        getQuizz(selected){
-
+        getQuizz(selected: Array<String>, selectedDifficulties: Array<String>){
             let tags = selected.toString();
-            console.log(tags)
-            this.generateQuizz(tags).then(response => {
+            let difficulties = selectedDifficulties.toString()
+            this.generateQuizz({tags, difficulties}).then(() => {
                 this.$router.push('/quizz')
             })
+        },
+        beautify(name: String) {
+            // Split the input string by underscores
+            const words = name.split('_');
+
+            // Capitalize the first letter of each word and join with spaces
+            const result = words
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+
+            return result;
         }
     },
     computed: {
-        ...mapState(['tag']),
+        ...mapState(['tag', 'quizz']),
     },
     mounted() {
         this.getAllTags();
     },
     data: () => ({
-        selected: []
+        selected: [],
+        difficulties: ['easy', 'medium', 'hard'],
+        selectedDifficulties: ['easy', 'medium', 'hard']
     })
 }
 </script>
