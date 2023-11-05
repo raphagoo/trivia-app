@@ -8,13 +8,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import Home from './views/Home.vue'
+import CreateQuizz from './views/CreateQuizz.vue'
 
 export default defineComponent({
     name: 'App',
 
     components: {
-    Home,
+        CreateQuizz,
     },
 
     data () {

@@ -1,88 +1,64 @@
 <template>
-    <v-row class="w-75 d-flex">
-        <v-col cols="9">
-            <v-select
-            v-model="selected"
-            :items="tag.all"
-            :item-props="itemProps"
-            item-value="category"
-            label="Select categories"
-            multiple
-
-            persistent-hint
-            ></v-select>
-            <v-checkbox class="d-flex w-25" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
+    <connection-manager></connection-manager>
+    <connection-state></connection-state>
+    <v-row>
+        <v-col cols="6">
+            <v-form @submit.prevent="pushRoom()">
+                <v-text-field v-model="roomName" label="Room Name"></v-text-field>
+                <v-btn type="submit" block class="mt-2">Host</v-btn>
+            </v-form>
         </v-col>
-    </v-row>
-    <v-row class="w-25 d-flex">
-        <v-col cols="12">
-            <v-btn @click="getQuizz(selected, selectedDifficulties)">Create Quizz</v-btn>
+        <v-col cols="6">
+            <div v-for="room in room.all" :key="room._id">
+                {{ room.name }}
+                <v-btn>Join</v-btn>
+            </div>
+
         </v-col>
     </v-row>
 </template>
 
 <script lang="ts">
 import {mapActions, mapState} from "vuex";
+import { socket } from "../socket";
+import ConnectionState from '../components/ConnectionState.vue';
+import ConnectionManager from '../components/ConnectionManager.vue';
 export default {
     name: 'home',
     components: {
-    },
-    watch: {
-        selectedDifficulties() {
-            if(this.selectedDifficulties.length === 0){
-
-            } else {
-                this.selected = [];
-                this.getAllTags(this.selectedDifficulties)
-            }
-        }
-    },
-    methods: {
-        itemProps (item: Tag) {
-            return {
-                title: this.beautify(item.category),
-                subtitle: item.value + ' questions available',
-            }
-        },
-        ...mapActions('tag', {
-            getAllTags: 'getAllTags',
-        }),
-        ...mapActions('quizz', {
-            generateQuizz: 'generateQuizz',
-        }),
-        getQuizz(selected: Array<String>, selectedDifficulties: Array<String>){
-            let tags = selected.toString();
-            let difficulties = selectedDifficulties.toString()
-            this.generateQuizz({tags, difficulties}).then(() => {
-                this.$router.push('/quizz')
-            })
-        },
-        beautify(name: String) {
-            // Split the input string by underscores
-            const words = name.split('_');
-
-            // Capitalize the first letter of each word and join with spaces
-            const result = words
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join(' ');
-
-            return result;
-        }
-    },
-    computed: {
-        ...mapState(['tag', 'quizz']),
+        ConnectionManager,
+        ConnectionState
     },
     mounted() {
-        this.getAllTags();
+        console.log('socket connected')
+        this.getAllRooms()
+        socket.on('create_room', payload => {
+            console.log('la room doit create')
+            this.addRoomToList(payload)
+        });
+    },
+    computed: {
+        ...mapState(['room']),
+    },
+    methods: {
+        pushRoom() {
+            this.createRoom(this.roomName).then(response => {
+                console.log('ca passe')
+                socket.emit('create_room', response.data)
+            })
+        },
+        ...mapActions('room', {
+            createRoom: 'createRoom',
+            getAllRooms: 'getAllRooms',
+            addRoomToList: 'addRoomToList',
+        }),
     },
     data: () => ({
-        selected: [],
-        difficulties: ['easy', 'medium', 'hard'],
-        selectedDifficulties: ['easy', 'medium', 'hard']
+        roomName: '',
+        username: ''
     })
 }
 </script>
-
 <style lang="scss" scoped>
 
 </style>

@@ -27,3 +27,8 @@ type Question = {
     points: number
     difficultyColorClass: String
 }
+
+type roomState = {
+    all: Array
+    creating: boolean
+}

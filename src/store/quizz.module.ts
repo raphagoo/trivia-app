@@ -1,6 +1,6 @@
 import { router } from '../router';
 import consoleLogger from "../interfaces/consoleLogger";
-import api from "../interfaces/apiInterface";
+import apiTrivia from "../interfaces/apiInterface";
 import { Commit } from 'vuex';
 import { AxiosResponse } from 'axios';
 
@@ -14,7 +14,7 @@ const actions = {
             if(tags !== '') {
                 url += '&tags=' + tags
             }
-            api.get(url, {
+            apiTrivia.get(url, {
                 headers: {'Accept': 'application/json'},
             }).then(response => {
                 commit('generateQuizzSuccess', response)

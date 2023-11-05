@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import Home from './views/Home.vue';
+import Home from './views/Home.vue'
+import CreateQuizz from './views/CreateQuizz.vue';
 import Quizz from './views/Quizz.vue';
 
 export const router = createRouter({
@@ -12,10 +13,15 @@ export const router = createRouter({
             component: Home
         },
         {
-          path: '/quizz',
-          name: 'quizz',
-          component: Quizz
-      },
+            path: '/host',
+            name: 'createQuizz',
+            component: CreateQuizz
+        },
+        {
+            path: '/quizz',
+            name: 'quizz',
+            component: Quizz
+        },
         {
             path: '/:pathMatch(.*)*',
             redirect: '/',

@@ -2,10 +2,12 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import { router } from '../router'
 import { default as $log } from '../interfaces/consoleLogger';
-const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+const apiTrivia = axios.create({
+    baseURL: import.meta.env.TRIVIA_API_URL,
 });
-
+const api = axios.create({
+    baseURL: 'http://127.0.0.1:3000',
+});
 api.interceptors.request.use(
     config => {
         $log.info('api.interceptors.request')

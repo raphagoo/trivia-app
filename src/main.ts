@@ -5,7 +5,6 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import { createApp } from 'vue'
 import App from './App.vue'
-
 const vuetify = createVuetify()
 
 const app = createApp(App)
