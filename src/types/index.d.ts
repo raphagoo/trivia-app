@@ -29,6 +29,23 @@ type Question = {
 }
 
 type roomState = {
-    all: Array
+    all: Array<Room>
     creating: boolean
+    joining: boolean
+}
+
+type Room = {
+    _id: string
+    name: string
+    users: Array<User>
+}
+
+type User = {
+    _id: string
+    username: string
+    password: string
+}
+
+type userState = {
+    logged: ?User
 }

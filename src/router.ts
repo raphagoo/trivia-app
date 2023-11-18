@@ -13,7 +13,7 @@ export const router = createRouter({
             component: Home
         },
         {
-            path: '/host',
+            path: '/room/:roomId',
             name: 'createQuizz',
             component: CreateQuizz
         },

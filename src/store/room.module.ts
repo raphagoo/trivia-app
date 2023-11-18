@@ -7,8 +7,14 @@ import { AxiosResponse } from 'axios';
 const state = {all: []};
 
 const actions = {
-    addRoomToList({commit}: {commit: Commit}, payload){
+    addRoomToList({commit}: {commit: Commit}, payload: Object){
         commit('addRoomToList', payload)
+    },
+    addUserToRoom({commit}: {commit: Commit}, payload: Object){
+        commit('addUserToRoom', payload)
+    },
+    removeUserFromRoom({commit}: {commit: Commit}, payload: Object){
+        commit('removeUserFromRoom', payload)
     },
     getAllRooms({ commit }: { commit: Commit }) {
         return new Promise(function(resolve, reject){
@@ -20,6 +26,20 @@ const actions = {
                 resolve(response)
             }).catch(error => {
                 commit('getAllRoomsError', error)
+                reject(error)
+            })
+        })
+    },
+    joinRoom({ commit }: { commit: Commit }, roomId: number) {
+        return new Promise(function(resolve, reject){
+            commit('joinRoomRequest');
+            api.post('/room/join/' + roomId, {}, {
+                headers: {'Accept': 'application/json'},
+            }).then(response => {
+                commit('joinRoomSuccess', response)
+                resolve(response)
+            }).catch(error => {
+                commit('joinRoomError', error)
                 reject(error)
             })
         })
@@ -45,8 +65,30 @@ const actions = {
 };
 
 const mutations = {
-    addRoomToList(state: roomState, payload) {
+    addRoomToList(state: roomState, payload: Room) {
         state.all.push(payload)
+    },
+    addUserToRoom(state: roomState, payload: any) {
+        const roomToUpdate = state.all.find(room => room._id === payload.room);
+        if(roomToUpdate) {
+            state.all.map(room => {
+                if(room._id === payload.room) {
+                    room.users.push(payload.user)
+                }
+            });
+            console.log(state.all)
+        }
+    },
+    removeUserFromRoom(state: roomState, payload: any) {
+        const roomToUpdate = state.all.find(room => room._id === payload.room);
+        if(roomToUpdate) {
+            state.all.map(room => {
+                if(room._id === payload.room) {
+                    let filteredUsers = room.users.filter(user => user._id !== payload.user._id)
+                    room.users = filteredUsers
+                }
+            });
+        }
     },
     createRoomRequest(state: roomState){
         state.creating = true
@@ -57,6 +99,16 @@ const mutations = {
     createRoomError(state: roomState, error: AxiosResponse) {
         consoleLogger.error(error)
         state.creating = false
+    },
+    joinRoomRequest(state: roomState){
+        state.joining = true
+    },
+    joinRoomSuccess(state: roomState, response: AxiosResponse) {
+        state.joining = false
+    },
+    joinRoomError(state: roomState, error: AxiosResponse) {
+        consoleLogger.error(error)
+        state.joining = false
     },
     getAllRoomsRequest(state: roomState){
         state.all = []

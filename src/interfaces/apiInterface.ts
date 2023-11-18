@@ -2,11 +2,8 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import { router } from '../router'
 import { default as $log } from '../interfaces/consoleLogger';
-const apiTrivia = axios.create({
-    baseURL: import.meta.env.TRIVIA_API_URL,
-});
 const api = axios.create({
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: import.meta.env.VITE_NODE_API_URL,
 });
 api.interceptors.request.use(
     config => {
@@ -26,7 +23,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
-    $log.debug(error.response)
+    $log.debug('test' + error)
     if (401 === error.response.status) {
         Swal.fire({
             title: "Session Expired",
