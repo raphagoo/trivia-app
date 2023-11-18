@@ -23,9 +23,14 @@
 
 <script lang="ts">
 import {mapActions, mapState} from "vuex";
+import { socket } from '../socket';
+import ConnectionState from '../components/ConnectionState.vue';
+import ConnectionManager from '../components/ConnectionManager.vue';
 export default {
     name: 'createQuizz',
     components: {
+        ConnectionManager,
+        ConnectionState
     },
     watch: {
         selectedDifficulties() {
@@ -50,6 +55,9 @@ export default {
         ...mapActions('quizz', {
             generateQuizz: 'generateQuizz',
         }),
+        ...mapActions('room', {
+            removeUserFromRoom: 'removeUserFromRoom',
+        }),
         getQuizz(selected: Array<String>, selectedDifficulties: Array<String>){
             let tags = selected.toString();
             let difficulties = selectedDifficulties.toString()
@@ -70,10 +78,16 @@ export default {
         }
     },
     computed: {
-        ...mapState(['tag', 'quizz']),
+        ...mapState(['tag', 'quizz', 'user']),
     },
     mounted() {
+        socket.on('leave_room', (payload: Object) => {
+            this.removeUserFromRoom(payload)
+        });
         this.getAllTags();
+    },
+    beforeUnmount() {
+        socket.emit('leave_room', {room: this.$route.params.roomId, user: this.user.logged})
     },
     data: () => ({
         selected: [],

@@ -1,6 +1,6 @@
 import { router } from '../router';
 import consoleLogger from "../interfaces/consoleLogger";
-import apiTrivia from "../interfaces/apiInterface";
+import apiTrivia from '../interfaces/apiTriviaInterface';
 import { Commit } from 'vuex';
 import { AxiosResponse } from 'axios';
 
