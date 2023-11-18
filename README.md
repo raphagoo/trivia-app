@@ -1,8 +1,6 @@
-# vue-starter
+# trivia-app
 
-The structure of my usuals Vue projects using vite
-
-[![Dependency Status](https://david-dm.org/raphagoo/vue-starterv2/status.svg)](https://david-dm.org/raphagoo/vue-starterv2#info=dependencies) [![devDependency Status](https://david-dm.org/raphagoo/vue-starterv2/dev-status.svg)](https://david-dm.org/raphagoo/vue-starterv2#info=devDependencies)
+[![Depfu](https://badges.depfu.com/badges/1e1036fc2f196f942c18214658bc5a8a/count.svg)](https://depfu.com/repos/github/raphagoo/trivia-app?project_id=39490)
 
 Here is a more complete [description](./description.md).
 
@@ -20,19 +18,19 @@ Here is a more complete [description](./description.md).
 
 ```bash
 # Clone this repo
-git clone https://github.com/raphagoo/vue-starterv2.git vue-starterv2
+git clone https://github.com/raphagoo/trivia-app.git trivia-app
 
 # change directory to your app
-cd vue-starterv2
+cd trivia-app
 
 # install the dependencies with npm
 npm i
 
 # start the server
-npm run dev
+npm start
 ```
 
-Go to http://localhost:3000 in your browser.
+Go to http://localhost:8080 in your browser.
 
 Note you can change the port (see [devServe.port](https://vitejs.dev/config/#server-port) doc)
 
