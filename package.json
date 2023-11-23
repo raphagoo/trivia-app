@@ -19,7 +19,7 @@
         "sweetalert2": "^11.10.0",
         "vue-router": "^4.2.5",
         "vue-socket.io-extended": "^5.0.0-alpha.5",
-        "vuetify": "^3.4.2",
+        "vuetify": "^3.4.3",
         "vuex": "^4.1.0",
         "vuex-persistedstate": "^4.1.0"
     },
