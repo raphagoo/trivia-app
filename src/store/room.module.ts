@@ -15,6 +15,7 @@ const actions = {
     },
     removeUserFromRoom({commit}: {commit: Commit}, payload: Object){
         commit('removeUserFromRoom', payload)
+        commit('checkRoomPopulation')
     },
     getAllRooms({ commit }: { commit: Commit }) {
         return new Promise(function(resolve, reject){
@@ -74,12 +75,14 @@ const mutations = {
             state.all.map(room => {
                 if(room._id === payload.room) {
                     room.users.push(payload.user)
+                    room.users = [...new Set(room.users)];
                 }
             });
-            console.log(state.all)
         }
     },
     removeUserFromRoom(state: roomState, payload: any) {
+        console.log(state.all)
+
         const roomToUpdate = state.all.find(room => room._id === payload.room);
         if(roomToUpdate) {
             state.all.map(room => {
@@ -89,6 +92,13 @@ const mutations = {
                 }
             });
         }
+    },
+    checkRoomPopulation(state: roomState){
+        console.log(state.all)
+        state.all.forEach(room => {
+            console.log(room)
+        })
+        state.all = state.all.filter((room) => room.users.length > 0);
     },
     createRoomRequest(state: roomState){
         state.creating = true
@@ -105,6 +115,7 @@ const mutations = {
     },
     joinRoomSuccess(state: roomState, response: AxiosResponse) {
         state.joining = false
+        state.active = response.data._id
     },
     joinRoomError(state: roomState, error: AxiosResponse) {
         consoleLogger.error(error)

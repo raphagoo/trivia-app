@@ -35,6 +35,9 @@ export default {
         socket.on('join_room', (payload: Object) => {
             this.addUserToRoom(payload)
         });
+        socket.on('leave_room', (payload: Object) => {
+            this.removeUserFromRoom(payload)
+        });
     },
     computed: {
         ...mapState(['room', 'user']),
@@ -74,7 +77,8 @@ export default {
             getAllRooms: 'getAllRooms',
             addRoomToList: 'addRoomToList',
             joinRoom: 'joinRoom',
-            addUserToRoom: 'addUserToRoom'
+            addUserToRoom: 'addUserToRoom',
+            removeUserFromRoom: 'removeUserFromRoom'
         }),
         ...mapActions('user', {
             createGuestUser: 'createGuestUser',

@@ -1,4 +1,7 @@
 <template>
+    <div v-for="user in activeRoom.users">
+        {{ user.username }}
+    </div>
     <v-row class="w-75 d-flex">
         <v-col cols="9">
             <v-select
@@ -23,6 +26,7 @@
 
 <script lang="ts">
 import {mapActions, mapState} from "vuex";
+import { useRoute } from 'vue-router'
 import { socket } from '../socket';
 import ConnectionState from '../components/ConnectionState.vue';
 import ConnectionManager from '../components/ConnectionManager.vue';
@@ -56,6 +60,7 @@ export default {
             generateQuizz: 'generateQuizz',
         }),
         ...mapActions('room', {
+            addUserToRoom: 'addUserToRoom',
             removeUserFromRoom: 'removeUserFromRoom',
         }),
         getQuizz(selected: Array<String>, selectedDifficulties: Array<String>){
@@ -78,21 +83,31 @@ export default {
         }
     },
     computed: {
-        ...mapState(['tag', 'quizz', 'user']),
+        ...mapState(['tag', 'quizz', 'user', 'room']),
+        activeRoom() {
+            return this.room.all.find((room: Room) => room._id === this.room.active);
+        }
     },
     mounted() {
+        const route = useRoute();
+        this.roomId = route.params.roomId
         socket.on('leave_room', (payload: Object) => {
             this.removeUserFromRoom(payload)
+        });
+        socket.on('join_room', (payload: Object) => {
+            console.log('user joined')
+            this.addUserToRoom(payload)
         });
         this.getAllTags();
     },
     beforeUnmount() {
-        socket.emit('leave_room', {room: this.$route.params.roomId, user: this.user.logged})
+        socket.emit('leave_room', {room: this.roomId, user: this.user.logged})
     },
     data: () => ({
         selected: [],
         difficulties: ['easy', 'medium', 'hard'],
-        selectedDifficulties: ['easy', 'medium', 'hard']
+        selectedDifficulties: ['easy', 'medium', 'hard'],
+        roomId: ''
     })
 }
 </script>

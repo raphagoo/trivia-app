@@ -32,6 +32,7 @@ type roomState = {
     all: Array<Room>
     creating: boolean
     joining: boolean
+    active: Room
 }
 
 type Room = {
