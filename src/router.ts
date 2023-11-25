@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import Home from './views/Home.vue'
 import CreateQuizz from './views/CreateQuizz.vue';
-import Quizz from './views/Quizz.vue';
 
 export const router = createRouter({
     history: createWebHistory(),
@@ -16,11 +15,6 @@ export const router = createRouter({
             path: '/room/:roomId',
             name: 'createQuizz',
             component: CreateQuizz
-        },
-        {
-            path: '/quizz',
-            name: 'quizz',
-            component: Quizz
         },
         {
             path: '/:pathMatch(.*)*',

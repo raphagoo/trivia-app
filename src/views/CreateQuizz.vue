@@ -1,8 +1,8 @@
 <template>
     <div v-for="user in activeRoom.users">
-        {{ user.username }}
+        <span v-if="user._id === activeRoom.owner">Owner : </span>{{ user.username }}
     </div>
-    <v-row class="w-75 d-flex">
+    <v-row v-if="user.logged._id === activeRoom.owner" class="w-75 d-flex">
         <v-col cols="9">
             <v-select
             v-model="selected"
@@ -12,29 +12,38 @@
             label="Select categories"
             multiple
 
+
             persistent-hint
             ></v-select>
-            <v-checkbox class="d-flex w-25" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
+            <v-checkbox :disabled="user.logged._id !== activeRoom.owner" class="d-flex w-25" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
         </v-col>
     </v-row>
-    <v-row class="w-25 d-flex">
+    <v-row v-if="user.logged._id === activeRoom.owner" class="w-25 d-flex">
         <v-col cols="12">
             <v-btn @click="getQuizz(selected, selectedDifficulties)">Create Quizz</v-btn>
+        </v-col>
+    </v-row>
+    <v-row v-if="ingame">
+        <v-col cols="12">
+            <Quizz ref="quizzComponent"></Quizz>
         </v-col>
     </v-row>
 </template>
 
 <script lang="ts">
+import { ref } from 'vue'
 import {mapActions, mapState} from "vuex";
 import { useRoute } from 'vue-router'
 import { socket } from '../socket';
 import ConnectionState from '../components/ConnectionState.vue';
 import ConnectionManager from '../components/ConnectionManager.vue';
+import Quizz from "../components/Quizz.vue";
 export default {
     name: 'createQuizz',
     components: {
         ConnectionManager,
-        ConnectionState
+        ConnectionState,
+        Quizz
     },
     watch: {
         selectedDifficulties() {
@@ -67,7 +76,8 @@ export default {
             let tags = selected.toString();
             let difficulties = selectedDifficulties.toString()
             this.generateQuizz({tags, difficulties}).then(() => {
-                this.$router.push('/quizz')
+                this.ingame = true
+                
             })
         },
         beautify(name: String) {
@@ -107,7 +117,8 @@ export default {
         selected: [],
         difficulties: ['easy', 'medium', 'hard'],
         selectedDifficulties: ['easy', 'medium', 'hard'],
-        roomId: ''
+        roomId: '',
+        ingame: false
     })
 }
 </script>
