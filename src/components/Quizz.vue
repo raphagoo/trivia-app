@@ -24,13 +24,20 @@ import Swal from 'sweetalert2';
 import VueCountdown from '@chenfengyuan/vue-countdown';
 export default {
     name: 'quizz',
+    expose: ['reset'],
     components: {
         VueCountdown
     },
     computed: {
         ...mapState(['quizz']),
     },
+    mounted() {
+        this.reset()
+    },
     methods: {
+        reset() {
+            console.log('reset')
+        },
         verifyAnswer(){
             if(this.selectedAnswer === this.quizz.generated[this.quizz.activeIndex].correctAnswer){
                 this.quizz.userScore += this.quizz.generated[this.quizz.activeIndex].points

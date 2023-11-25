@@ -32,12 +32,14 @@ type roomState = {
     all: Array<Room>
     creating: boolean
     joining: boolean
+    active: Room
 }
 
 type Room = {
     _id: string
     name: string
     users: Array<User>
+    owner: User
 }
 
 type User = {
