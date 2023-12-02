@@ -24,9 +24,7 @@
                         beautify(quizz.generated[quizz.activeIndex].difficulty)
                     }}
                     -
-                    {{
-                        quizz.generated[quizz.activeIndex].points
-                    }}
+                    {{ quizz.generated[quizz.activeIndex].points }}
                     points</v-card-subtitle
                 >
                 <v-card-text>{{
