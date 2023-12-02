@@ -7,7 +7,9 @@
         "build": "vite build",
         "start": "vite",
         "preview": "vite preview",
-        "test": "jest ./src/tests"
+        "test": "jest ./src/tests",
+        "prettier-check": "prettier ./src -c --no-semi --single-quote",
+        "prettier-write": "prettier ./src -w --no-semi --single-quote"
     },
     "dependencies": {
         "@chenfengyuan/vue-countdown": "^2.1.2",

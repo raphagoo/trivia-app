@@ -1,32 +1,38 @@
-import { Commit } from 'vuex';
-import { AxiosResponse } from 'axios';
-import api from "../interfaces/apiInterface";
-import consoleLogger from '../interfaces/consoleLogger';
+import { Commit } from 'vuex'
+import { AxiosResponse } from 'axios'
+import api from '../interfaces/apiInterface'
+import consoleLogger from '../interfaces/consoleLogger'
 
-const state = {};
+const state = {}
 
 const actions = {
     createGuestUser({ commit }: { commit: Commit }) {
-        return new Promise(function(resolve, reject){
-            commit('createGuestUserRequest');
-            api.post('/user/guest', {}, {
-                headers: {'Accept': 'application/json'},
-            }).then(response => {
-                commit('createGuestUserSuccess', response)
-                resolve(response)
-            }).catch(error => {
-                commit('createGuestUserError', error)
-                reject(error)
-            })
+        return new Promise(function (resolve, reject) {
+            commit('createGuestUserRequest')
+            api.post(
+                '/user/guest',
+                {},
+                {
+                    headers: { Accept: 'application/json' },
+                },
+            )
+                .then((response) => {
+                    commit('createGuestUserSuccess', response)
+                    resolve(response)
+                })
+                .catch((error) => {
+                    commit('createGuestUserError', error)
+                    reject(error)
+                })
         })
     },
     logout({ commit }: { commit: Commit }) {
-        commit('logout');
+        commit('logout')
     },
-};
+}
 
 const mutations = {
-    createGuestUserRequest(state: userState){
+    createGuestUserRequest(state: userState) {
         state.logged = null
     },
     createGuestUserSuccess(state: userState, response: AxiosResponse) {
@@ -38,14 +44,14 @@ const mutations = {
         consoleLogger.error(error)
     },
     logout(state: userState) {
-        state.logged = null;
+        state.logged = null
         localStorage.removeItem('token')
     },
-};
+}
 
 export const user = {
     namespaced: true,
     state,
     actions,
-    mutations
-};
+    mutations,
+}
