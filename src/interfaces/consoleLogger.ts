@@ -29,28 +29,28 @@
  * })
  */
 
-const logLevelConf = import.meta.env.VITE_LOG_LEVEL;
+const logLevelConf = import.meta.env.VITE_LOG_LEVEL
 
 const LOG_LEVELS = ['trace', 'debug', 'info', 'warn', 'error']
 
-const logLevel = (LOG_LEVELS.includes(logLevelConf)) ? logLevelConf : 'error';
+const logLevel = LOG_LEVELS.includes(logLevelConf) ? logLevelConf : 'error'
 
 function _log(level: string, ...msg: any) {
     /* eslint-disable no-console */
     if (LOG_LEVELS.indexOf(level) >= LOG_LEVELS.indexOf(logLevel)) {
         switch (level) {
             case 'error':
-                console.error(...msg);
-                break;
+                console.error(...msg)
+                break
             case 'warn':
-                console.warn(...msg);
-                break;
+                console.warn(...msg)
+                break
             case 'info':
-                console.info(...msg);
-                break;
+                console.info(...msg)
+                break
             default:
-                console.log(...msg);
-                break;
+                console.log(...msg)
+                break
         }
     }
     /* eslint-enable no-console */

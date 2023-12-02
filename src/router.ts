@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router'
 
 import Home from './views/Home.vue'
-import CreateQuizz from './views/CreateQuizz.vue';
+import CreateQuizz from './views/CreateQuizz.vue'
 
 export const router = createRouter({
     history: createWebHistory(),
@@ -9,18 +9,18 @@ export const router = createRouter({
         {
             path: '/',
             name: 'home',
-            component: Home
+            component: Home,
         },
         {
             path: '/room/:roomId',
             name: 'createQuizz',
-            component: CreateQuizz
+            component: CreateQuizz,
         },
         {
             path: '/:pathMatch(.*)*',
             redirect: '/',
         },
-    ]
+    ],
 })
 
 router.beforeEach((to: any, from: any, next: any) => {
@@ -33,5 +33,5 @@ router.beforeEach((to: any, from: any, next: any) => {
     //return next('/login');
     //}
 
-    next();
+    next()
 })
