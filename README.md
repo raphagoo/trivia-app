@@ -1,6 +1,8 @@
 # trivia-app
 
 [![Depfu](https://badges.depfu.com/badges/1e1036fc2f196f942c18214658bc5a8a/count.svg)](https://depfu.com/repos/github/raphagoo/trivia-app?project_id=39490)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
 
 Here is a more complete [description](./description.md).
 
