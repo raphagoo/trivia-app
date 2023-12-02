@@ -1,4 +1,4 @@
-name: Prettier
+name: Tests
 
 on:
   push:
@@ -25,4 +25,10 @@ jobs:
     - name: Build
       run: |
         npm install --force
+    - name: Prettier
+      run: |
         npm run prettier-check
+    - name: Run
+      run: |
+        npm start
+ 
