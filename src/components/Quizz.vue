@@ -8,9 +8,9 @@
             <v-card class="elevation-3">
                 <v-card-title>{{ beautify(quizz.generated[quizz.activeIndex].category) }}</v-card-title>
                 <v-card-subtitle :class="quizz.generated[quizz.activeIndex].difficultyColorClass">{{ beautify(quizz.generated[quizz.activeIndex].difficulty) }} - {{ quizz.generated[quizz.activeIndex].points }} points</v-card-subtitle>
-                <v-card-text>{{ quizz.generated[quizz.activeIndex].question.text }}</v-card-text>
+                <v-card-text>{{ quizz.generated[quizz.activeIndex].question }}</v-card-text>
                 <v-card-actions class="justify-center answers" v-for="answer in quizz.generated[quizz.activeIndex].answers" :key="answer">
-                    <v-checkbox-btn :value="answer" v-model="selectedAnswer"></v-checkbox-btn> <div class="w-80">{{ answer }}</div>
+                    <v-checkbox-btn :value="answer" v-model="selectedAnswer"></v-checkbox-btn> <div class="w-80">{{ answer.answer }}</div>
                 </v-card-actions>
             </v-card>
         </v-col>

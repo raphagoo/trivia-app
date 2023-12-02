@@ -1,6 +1,6 @@
 import { router } from '../router';
 import consoleLogger from "../interfaces/consoleLogger";
-import apiTrivia from '../interfaces/apiTriviaInterface';
+import api from '../interfaces/apiInterface';
 import { Commit } from 'vuex';
 import { AxiosResponse } from 'axios';
 
@@ -10,7 +10,7 @@ const actions = {
     getAllTags({ commit }: { commit: Commit }, difficulties: String = 'easy,medium,hard') {
         return new Promise(function(resolve, reject){
             commit('getAllTagsRequest');
-            apiTrivia.get('/totals-per-tag?difficulties=' + difficulties, {
+            api.get('/trivia/tags?difficulties=' + difficulties, {
                 headers: {'Accept': 'application/json'},
             }).then(response => {
                 commit('getAllTagsSuccess', response)

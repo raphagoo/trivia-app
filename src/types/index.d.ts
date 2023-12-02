@@ -20,8 +20,7 @@ type Question = {
     tags: Array
     difficulty: String
     question: Object
-    correctAnswer: String
-    incorrectAnswers: Array
+    answers: Array
     type: String
     answers: Array
     points: number
