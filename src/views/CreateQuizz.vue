@@ -52,19 +52,15 @@ export default {
         ...mapActions('tag', {
             getAllTags: 'getAllTags',
         }),
-        ...mapActions('quizz', {
-            generateQuizz: 'generateQuizz',
-        }),
         ...mapActions('room', {
             addUserToRoom: 'addUserToRoom',
+            generateQuizz: 'generateQuizz',
             removeUserFromRoom: 'removeUserFromRoom',
         }),
         getQuizz(selected: Array<String>, selectedDifficulties: Array<String>) {
             let tags = selected.toString()
             let difficulties = selectedDifficulties.toString()
-            this.generateQuizz({ tags, difficulties }).then(() => {
-                this.ingame = true
-            })
+            socket.emit('generate_quizz', { tags: tags, difficulties: difficulties })
         },
         beautify(name: String) {
             // Split the input string by underscores
@@ -77,9 +73,9 @@ export default {
         },
     },
     computed: {
-        ...mapState(['tag', 'quizz', 'user', 'room']),
+        ...mapState(['tag', 'user', 'room']),
         activeRoom() {
-            return this.room.all.find((room: Room) => room._id === this.room.active)
+            return this.room.all.find((room: Room) => room._id === this.room.active._id)
         },
     },
     mounted() {
@@ -91,6 +87,15 @@ export default {
         socket.on('join_room', (payload: Object) => {
             console.log('user joined')
             this.addUserToRoom(payload)
+        })
+        socket.on('generate_quizz', (payload: Array<Question>) => {
+            this.generateQuizz(payload).then(() => {
+                this.ingame = true
+            })
+        })
+        socket.on('start_game', (payload: Room) => {
+            console.log('game started')
+            this.ingame = true
         })
         this.getAllTags()
     },

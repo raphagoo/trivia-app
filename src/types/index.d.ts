@@ -8,10 +8,9 @@ type Tag = {
     value: number
 }
 
-type quizzState = {
+type Quizz = {
     generated: Array<Question>
     activeIndex: number
-    userScore: number
 }
 
 type Question = {
@@ -32,6 +31,7 @@ type roomState = {
     creating: boolean
     joining: boolean
     active: Room
+    quizz: Quizz
 }
 
 type Room = {
@@ -45,8 +45,14 @@ type User = {
     _id: string
     username: string
     password: string
+    userScore: number
 }
 
 type userState = {
     logged: ?User
+}
+
+type payloadAnswer = {
+    correct: boolean
+    user: string
 }
