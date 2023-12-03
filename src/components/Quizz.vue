@@ -6,19 +6,22 @@
                 <v-progress-linear :model-value="seconds * 5"></v-progress-linear>
             </vue-countdown>
             <v-card class="elevation-3">
-                <v-card-title>{{ beautify(quizz.generated[quizz.activeIndex].category) }}</v-card-title>
-                <v-card-subtitle :class="quizz.generated[quizz.activeIndex].difficultyColorClass"
-                    >{{ beautify(quizz.generated[quizz.activeIndex].difficulty) }}
+                <v-card-title>{{ beautify(room.quizz.generated[room.quizz.activeIndex].category) }}</v-card-title>
+                <v-card-subtitle :class="room.quizz.generated[room.quizz.activeIndex].difficultyColorClass"
+                    >{{ beautify(room.quizz.generated[room.quizz.activeIndex].difficulty) }}
                     -
-                    {{ quizz.generated[quizz.activeIndex].points }}
+                    {{ room.quizz.generated[room.quizz.activeIndex].points }}
                     points</v-card-subtitle
                 >
-                <v-card-text>{{ quizz.generated[quizz.activeIndex].question }}</v-card-text>
-                <v-card-actions class="justify-center answers" v-for="answer in quizz.generated[quizz.activeIndex].answers" :key="answer">
+                <v-card-text>{{ room.quizz.generated[room.quizz.activeIndex].question }}</v-card-text>
+                <v-card-actions class="justify-center answers" v-for="answer in room.quizz.generated[room.quizz.activeIndex].answers" :key="answer">
                     <v-checkbox-btn :value="answer" v-model="selectedAnswer"></v-checkbox-btn>
                     <div class="w-80">{{ answer.answer }}</div>
                 </v-card-actions>
             </v-card>
+        </v-col>
+        <v-col cols="3">
+            <div v-for="user in room.active.users">{{ user.username }} : {{ user.userScore }}</div>
         </v-col>
     </v-row>
 </template>
@@ -27,6 +30,7 @@
 import { mapState, mapActions } from 'vuex'
 import Swal from 'sweetalert2'
 import VueCountdown from '@chenfengyuan/vue-countdown'
+import { socket } from '../socket'
 export default {
     name: 'quizz',
     expose: ['reset'],
@@ -34,34 +38,35 @@ export default {
         VueCountdown,
     },
     computed: {
-        ...mapState(['quizz']),
+        ...mapState(['user', 'room']),
     },
     mounted() {
         this.reset()
+        socket.on('checked_answer', (payload: Object) => {
+            console.log('answer checked')
+            this.checkedAnswer(payload)
+        })
     },
     methods: {
         reset() {
             console.log('reset')
         },
         verifyAnswer() {
-            if (this.selectedAnswer === this.quizz.generated[this.quizz.activeIndex].correctAnswer) {
-                this.quizz.userScore += this.quizz.generated[this.quizz.activeIndex].points
-            } else {
-                window.alert(false)
-            }
+            socket.emit('check_answer', { answer: this.selectedAnswer, user: this.user.logged })
             this.selectedAnswer = ''
-            if (this.quizz.activeIndex + 1 < this.quizz.generated.length) {
+            if (this.room.quizz.activeIndex + 1 < this.room.quizz.generated.length) {
                 this.nextQuestion()
                 this.$refs.vueCountdown.restart()
             } else {
+                const foundUser = this.room.active.users.find((user: User) => user._id === this.user.logged._id)
+                this.$refs.vueCountdown.restart()
                 this.endQuizz()
                 Swal.fire({
                     title: 'End of quizz',
-                    text: 'You got ' + this.quizz.userScore + ' points',
+                    text: 'You got ' + foundUser.userScore + ' points',
                     icon: 'success',
                     confirmButtonText: 'yay',
                 })
-                this.$router.push('/')
             }
         },
         beautify(name: String) {
@@ -73,9 +78,10 @@ export default {
 
             return result
         },
-        ...mapActions('quizz', {
+        ...mapActions('room', {
             nextQuestion: 'nextQuestion',
             endQuizz: 'endQuizz',
+            checkedAnswer: 'checkedAnswer',
         }),
     },
     data: () => ({
