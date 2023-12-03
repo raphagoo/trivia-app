@@ -7,10 +7,7 @@ import { AxiosResponse } from 'axios'
 const state = { all: [] }
 
 const actions = {
-    getAllTags(
-        { commit }: { commit: Commit },
-        difficulties: String = 'easy,medium,hard',
-    ) {
+    getAllTags({ commit }: { commit: Commit }, difficulties: String = 'easy,medium,hard') {
         return new Promise(function (resolve, reject) {
             commit('getAllTagsRequest')
             api.get('/trivia/tags?difficulties=' + difficulties, {

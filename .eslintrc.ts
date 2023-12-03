@@ -13,7 +13,7 @@ module.exports = {
         '@vue/eslint-config-typescript',
     ],
     parserOptions: {
-        ecmaVersion: 2020,
+        ecmaVersion: 15,
     },
     plugins: ['vue'],
     // add your custom rules here

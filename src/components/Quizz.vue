@@ -1,44 +1,21 @@
 <template>
     <v-row class="h-100 bg-grey" align="center" justify="center">
         <v-col cols="9">
-            <vue-countdown
-                ref="vueCountdown"
-                :time="countdown"
-                @end="verifyAnswer()"
-                v-slot="{ seconds }"
-            >
+            <vue-countdown ref="vueCountdown" :time="countdown" @end="verifyAnswer()" v-slot="{ seconds }">
                 Time Remaining: {{ seconds }} seconds.
-                <v-progress-linear
-                    :model-value="seconds * 5"
-                ></v-progress-linear>
+                <v-progress-linear :model-value="seconds * 5"></v-progress-linear>
             </vue-countdown>
             <v-card class="elevation-3">
-                <v-card-title>{{
-                    beautify(quizz.generated[quizz.activeIndex].category)
-                }}</v-card-title>
-                <v-card-subtitle
-                    :class="
-                        quizz.generated[quizz.activeIndex].difficultyColorClass
-                    "
-                    >{{
-                        beautify(quizz.generated[quizz.activeIndex].difficulty)
-                    }}
+                <v-card-title>{{ beautify(quizz.generated[quizz.activeIndex].category) }}</v-card-title>
+                <v-card-subtitle :class="quizz.generated[quizz.activeIndex].difficultyColorClass"
+                    >{{ beautify(quizz.generated[quizz.activeIndex].difficulty) }}
                     -
                     {{ quizz.generated[quizz.activeIndex].points }}
                     points</v-card-subtitle
                 >
-                <v-card-text>{{
-                    quizz.generated[quizz.activeIndex].question
-                }}</v-card-text>
-                <v-card-actions
-                    class="justify-center answers"
-                    v-for="answer in quizz.generated[quizz.activeIndex].answers"
-                    :key="answer"
-                >
-                    <v-checkbox-btn
-                        :value="answer"
-                        v-model="selectedAnswer"
-                    ></v-checkbox-btn>
+                <v-card-text>{{ quizz.generated[quizz.activeIndex].question }}</v-card-text>
+                <v-card-actions class="justify-center answers" v-for="answer in quizz.generated[quizz.activeIndex].answers" :key="answer">
+                    <v-checkbox-btn :value="answer" v-model="selectedAnswer"></v-checkbox-btn>
                     <div class="w-80">{{ answer.answer }}</div>
                 </v-card-actions>
             </v-card>
@@ -67,12 +44,8 @@ export default {
             console.log('reset')
         },
         verifyAnswer() {
-            if (
-                this.selectedAnswer ===
-                this.quizz.generated[this.quizz.activeIndex].correctAnswer
-            ) {
-                this.quizz.userScore +=
-                    this.quizz.generated[this.quizz.activeIndex].points
+            if (this.selectedAnswer === this.quizz.generated[this.quizz.activeIndex].correctAnswer) {
+                this.quizz.userScore += this.quizz.generated[this.quizz.activeIndex].points
             } else {
                 window.alert(false)
             }
@@ -96,13 +69,7 @@ export default {
             const words = name.split('_')
 
             // Capitalize the first letter of each word and join with spaces
-            const result = words
-                .map(
-                    (word) =>
-                        word.charAt(0).toUpperCase() +
-                        word.slice(1).toLowerCase(),
-                )
-                .join(' ')
+            const result = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
 
             return result
         },

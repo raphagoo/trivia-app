@@ -7,13 +7,7 @@ import { AxiosResponse } from 'axios'
 const state = {}
 
 const actions = {
-    generateQuizz(
-        { commit }: { commit: Commit },
-        {
-            tags = '',
-            difficulties = 'easy,medium,hard',
-        }: { tags: String; difficulties: String },
-    ) {
+    generateQuizz({ commit }: { commit: Commit }, { tags = '', difficulties = 'easy,medium,hard' }: { tags: String; difficulties: String }) {
         return new Promise(function (resolve, reject) {
             commit('generateQuizzRequest')
             let url = '/trivia/questions?limit=3&difficulties=' + difficulties
