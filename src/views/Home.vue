@@ -2,10 +2,7 @@
     <v-row>
         <v-col cols="6">
             <v-form @submit.prevent="pushRoom()">
-                <v-text-field
-                    v-model="roomName"
-                    label="Room Name"
-                ></v-text-field>
+                <v-text-field v-model="roomName" label="Room Name"></v-text-field>
                 <v-btn type="submit" block class="mt-2">Host</v-btn>
             </v-form>
         </v-col>

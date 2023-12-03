@@ -11,8 +11,7 @@ api.interceptors.request.use(
         if (localStorage.getItem('token') !== null) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
             // @ts-ignore
-            config.headers.Authorization =
-                'Bearer ' + localStorage.getItem('token')
+            config.headers.Authorization = 'Bearer ' + localStorage.getItem('token')
         }
         return config
     },

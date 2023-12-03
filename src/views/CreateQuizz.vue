@@ -1,35 +1,14 @@
 <template>
-    <div v-for="user in activeRoom.users">
-        <span v-if="user._id === activeRoom.owner">Owner : </span
-        >{{ user.username }}
-    </div>
+    <div v-for="user in activeRoom.users"><span v-if="user._id === activeRoom.owner">Owner : </span>{{ user.username }}</div>
     <v-row v-if="user.logged._id === activeRoom.owner" class="w-75 d-flex">
         <v-col cols="9">
-            <v-select
-                v-model="selected"
-                :items="tag.all"
-                :item-props="itemProps"
-                item-value="category"
-                label="Select categories"
-                multiple
-                persistent-hint
-            ></v-select>
-            <v-checkbox
-                :disabled="user.logged._id !== activeRoom.owner"
-                class="d-flex w-25"
-                :label="difficulty"
-                v-for="difficulty in difficulties"
-                v-model="selectedDifficulties"
-                :value="difficulty"
-                :key="difficulty"
-            ></v-checkbox>
+            <v-select v-model="selected" :items="tag.all" :item-props="itemProps" item-value="category" label="Select categories" multiple persistent-hint></v-select>
+            <v-checkbox :disabled="user.logged._id !== activeRoom.owner" class="d-flex w-25" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
         </v-col>
     </v-row>
     <v-row v-if="user.logged._id === activeRoom.owner" class="w-25 d-flex">
         <v-col cols="12">
-            <v-btn @click="getQuizz(selected, selectedDifficulties)"
-                >Create Quizz</v-btn
-            >
+            <v-btn @click="getQuizz(selected, selectedDifficulties)">Create Quizz</v-btn>
         </v-col>
     </v-row>
     <v-row v-if="ingame">
@@ -92,13 +71,7 @@ export default {
             const words = name.split('_')
 
             // Capitalize the first letter of each word and join with spaces
-            const result = words
-                .map(
-                    (word) =>
-                        word.charAt(0).toUpperCase() +
-                        word.slice(1).toLowerCase(),
-                )
-                .join(' ')
+            const result = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
 
             return result
         },
@@ -106,9 +79,7 @@ export default {
     computed: {
         ...mapState(['tag', 'quizz', 'user', 'room']),
         activeRoom() {
-            return this.room.all.find(
-                (room: Room) => room._id === this.room.active,
-            )
+            return this.room.all.find((room: Room) => room._id === this.room.active)
         },
     },
     mounted() {

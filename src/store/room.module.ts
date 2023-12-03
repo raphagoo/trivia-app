@@ -101,9 +101,7 @@ const mutations = {
         if (roomToUpdate) {
             state.all.map((room) => {
                 if (room._id === payload.room) {
-                    let filteredUsers = room.users.filter(
-                        (user) => user._id !== payload.user._id,
-                    )
+                    let filteredUsers = room.users.filter((user) => user._id !== payload.user._id)
                     room.users = filteredUsers
                 }
             })
