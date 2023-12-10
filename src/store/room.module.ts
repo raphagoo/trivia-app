@@ -87,7 +87,7 @@ const actions = {
         commit('nextQuestion')
     },
     endQuizz({ commit }: { commit: Commit }) {
-        commit('resetActiveIndex')
+        commit('endQuizz')
     },
 }
 
@@ -192,16 +192,23 @@ const mutations = {
         state.quizz.generated = []
     },
     checkedAnswer(state: roomState, payload: payloadAnswer) {
-        if (payload.correct) {
-            let userIndex = state.active.users.findIndex((user) => user._id === payload.user)
-            state.active.users[userIndex].userScore += state.quizz.generated[state.quizz.activeIndex].points
-        }
+        return new Promise(function (resolve, reject) {
+            console.log('test', payload)
+            if (payload.correct) {
+                let userIndex = state.active.users.findIndex((user) => user._id === payload.user)
+                state.active.users[userIndex].userScore += state.quizz.generated[state.quizz.activeIndex].points
+            }
+            resolve('')
+        })
     },
     nextQuestion(state: roomState) {
         state.quizz.activeIndex++
     },
-    resetActiveIndex(state: roomState) {
+    endQuizz(state: roomState) {
         state.quizz.activeIndex = 0
+        state.active.users.forEach(user => {
+            user.userScore = 0
+        });
     },
 }
 

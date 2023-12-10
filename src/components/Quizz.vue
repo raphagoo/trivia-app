@@ -1,9 +1,9 @@
 <template>
     <v-row class="h-100 bg-grey" align="center" justify="center">
         <v-col cols="9">
-            <vue-countdown ref="vueCountdown" :time="countdown" @end="verifyAnswer()" v-slot="{ seconds }">
+            <vue-countdown ref="vueCountdown" :time="countdown" :auto-start="false" @end="verifyAnswer()" v-slot="{ seconds }">
                 Time Remaining: {{ seconds }} seconds.
-                <v-progress-linear :model-value="seconds * 5"></v-progress-linear>
+                <v-progress-linear :model-value="seconds * 20"></v-progress-linear>
             </vue-countdown>
             <v-card class="elevation-3">
                 <v-card-title>{{ beautify(room.quizz.generated[room.quizz.activeIndex].category) }}</v-card-title>
@@ -31,9 +31,11 @@ import { mapState, mapActions } from 'vuex'
 import Swal from 'sweetalert2'
 import VueCountdown from '@chenfengyuan/vue-countdown'
 import { socket } from '../socket'
-export default {
+import { ref, defineComponent } from 'vue'
+
+export default defineComponent({
     name: 'quizz',
-    expose: ['reset'],
+    expose: ['start'],
     components: {
         VueCountdown,
     },
@@ -41,33 +43,38 @@ export default {
         ...mapState(['user', 'room']),
     },
     mounted() {
-        this.reset()
         socket.on('checked_answer', (payload: Object) => {
-            console.log('answer checked')
             this.checkedAnswer(payload)
+            .then(() => {
+                this.selectedAnswer = ''
+                console.log('quizz lenght',this.room.quizz.generated )
+                console.log('index', this.room.quizz.activeIndex)
+                if (this.room.quizz.activeIndex + 1 < this.room.quizz.generated.length) {
+
+                    this.nextQuestion()
+                    this.$refs.vueCountdown.restart()
+                } else {
+                    const foundUser = this.room.active.users.find((user: User) => user._id === this.user.logged._id)
+                    Swal.fire({
+                        title: 'End of quizz',
+                        text: 'You got ' + foundUser.userScore + ' points',
+                        icon: 'success',
+                        confirmButtonText: 'yay',
+                    })
+                    if(this.room.active.owner === this.user.logged._id){
+                        socket.emit('end_game', {room: this.room.active._id})
+                    }
+                }
+            })
         })
     },
     methods: {
-        reset() {
-            console.log('reset')
+        start() {
+            console.log('test')
+            this.$refs.vueCountdown.start()
         },
         verifyAnswer() {
             socket.emit('check_answer', { answer: this.selectedAnswer, user: this.user.logged })
-            this.selectedAnswer = ''
-            if (this.room.quizz.activeIndex + 1 < this.room.quizz.generated.length) {
-                this.nextQuestion()
-                this.$refs.vueCountdown.restart()
-            } else {
-                const foundUser = this.room.active.users.find((user: User) => user._id === this.user.logged._id)
-                this.$refs.vueCountdown.restart()
-                this.endQuizz()
-                Swal.fire({
-                    title: 'End of quizz',
-                    text: 'You got ' + foundUser.userScore + ' points',
-                    icon: 'success',
-                    confirmButtonText: 'yay',
-                })
-            }
         },
         beautify(name: String) {
             // Split the input string by underscores
@@ -80,15 +87,14 @@ export default {
         },
         ...mapActions('room', {
             nextQuestion: 'nextQuestion',
-            endQuizz: 'endQuizz',
             checkedAnswer: 'checkedAnswer',
         }),
     },
     data: () => ({
         selectedAnswer: '',
-        countdown: 20 * 1000,
+        countdown: 5 * 1000,
     }),
-}
+})
 </script>
 
 <style>

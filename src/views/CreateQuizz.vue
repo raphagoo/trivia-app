@@ -11,7 +11,7 @@
             <v-btn @click="getQuizz(selected, selectedDifficulties)">Create Quizz</v-btn>
         </v-col>
     </v-row>
-    <v-row v-if="ingame">
+    <v-row v-show="ingame">
         <v-col cols="12">
             <Quizz ref="quizzComponent"></Quizz>
         </v-col>
@@ -26,6 +26,8 @@ import { socket } from '../socket'
 import ConnectionState from '../components/ConnectionState.vue'
 import ConnectionManager from '../components/ConnectionManager.vue'
 import Quizz from '../components/Quizz.vue'
+
+const quizzComponent = ref<InstanceType<typeof Quizz>>()
 export default {
     name: 'createQuizz',
     components: {
@@ -55,6 +57,7 @@ export default {
         ...mapActions('room', {
             addUserToRoom: 'addUserToRoom',
             generateQuizz: 'generateQuizz',
+            endQuizz: 'endQuizz',
             removeUserFromRoom: 'removeUserFromRoom',
         }),
         getQuizz(selected: Array<String>, selectedDifficulties: Array<String>) {
@@ -90,12 +93,20 @@ export default {
         })
         socket.on('generate_quizz', (payload: Array<Question>) => {
             this.generateQuizz(payload).then(() => {
-                this.ingame = true
+                if(this.user.logged._id === this.room.active.owner) {
+                    socket.emit('start_game', {room: this.room.active._id})
+                }
             })
         })
-        socket.on('start_game', (payload: Room) => {
+        socket.on('started_game', (payload: Room) => {
             console.log('game started')
             this.ingame = true
+            this.$refs.quizzComponent.start()
+        })
+        socket.on('end_game', (payload: Object) => {
+            console.log('game ended')
+            this.ingame = false
+            this.endQuizz()
         })
         this.getAllTags()
     },
