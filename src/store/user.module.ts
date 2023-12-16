@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios'
 import api from '../interfaces/apiInterface'
 import consoleLogger from '../interfaces/consoleLogger'
 
-const state = {}
+const state: userState = { logged: null }
 
 const actions = {
     createGuestUser({ commit }: { commit: Commit }) {

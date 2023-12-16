@@ -9,6 +9,7 @@
         <v-col cols="6">
             <div v-for="room in room.all" :key="room._id">
                 {{ room.name }} - {{ room.users.length }} users connected
+                <div v-if="room.inGame">En jeu</div>
                 <v-btn @click="toRoom(room._id)">Join</v-btn>
             </div>
         </v-col>

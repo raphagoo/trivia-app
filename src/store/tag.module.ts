@@ -4,7 +4,7 @@ import api from '../interfaces/apiInterface'
 import { Commit } from 'vuex'
 import { AxiosResponse } from 'axios'
 
-const state = { all: [] }
+const state: tagState = { all: [] }
 
 const actions = {
     getAllTags({ commit }: { commit: Commit }, difficulties: String = 'easy,medium,hard') {

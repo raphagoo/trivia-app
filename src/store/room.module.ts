@@ -1,10 +1,9 @@
-import { router } from '../router'
 import consoleLogger from '../interfaces/consoleLogger'
 import api from '../interfaces/apiInterface'
 import { Commit } from 'vuex'
 import { AxiosResponse } from 'axios'
 
-const state = { all: [], quizz: {}, active: null }
+const state: roomState = { all: [], creating: false, joining: false, quizz: { time: 10, generated: [], activeIndex: 0 }, active: null }
 
 const actions = {
     addRoomToList({ commit }: { commit: Commit }, payload: Object) {
@@ -24,7 +23,7 @@ const actions = {
                 headers: { Accept: 'application/json' },
             })
                 .then((response) => {
-                    commit('getAllRoomsSuccess', response)
+                    commit('getAllRoomsSuccess', response.data)
                     resolve(response)
                 })
                 .catch((error) => {
@@ -77,8 +76,8 @@ const actions = {
                 })
         })
     },
-    generateQuizz({ commit }: { commit: Commit }, { questions }: { questions: Array<Question> }) {
-        commit('generateQuizz', questions)
+    generateQuizz({ commit }: { commit: Commit }, { content }: { content: generatedQuizz }) {
+        commit('generateQuizz', content)
     },
     checkedAnswer({ commit }: { commit: Commit }, payload: Object) {
         commit('checkedAnswer', payload)
@@ -154,8 +153,8 @@ const mutations = {
     getAllRoomsRequest(state: roomState) {
         state.all = []
     },
-    getAllRoomsSuccess(state: roomState, response: AxiosResponse) {
-        state.all = [...new Set(response.data)]
+    getAllRoomsSuccess(state: roomState, data: Array<Room>) {
+        state.all = [...new Set(data)]
     },
     getAllRoomsError(state: roomState, error: AxiosResponse) {
         consoleLogger.error(error)
@@ -164,8 +163,9 @@ const mutations = {
     generateQuizzRequest(state: roomState) {
         state.quizz.generated = []
     },
-    generateQuizz(state: roomState, questions: Array<Question>) {
-        questions.forEach((question: Question) => {
+    generateQuizz(state: roomState, content: generatedQuizz) {
+        console.log(content.questions)
+        content.questions.forEach((question: Question) => {
             switch (question.difficulty) {
                 case 'easy':
                     question.points = 10
@@ -181,9 +181,10 @@ const mutations = {
                     break
             }
         })
-        state.quizz.generated = questions
+        state.quizz.time = parseInt(content.time)
+        state.quizz.generated = content.questions
         state.quizz.activeIndex = 0
-        state.active.users.forEach((user: User) => {
+        state.active?.users.forEach((user: User) => {
             user.userScore = 0
         })
     },
@@ -192,23 +193,21 @@ const mutations = {
         state.quizz.generated = []
     },
     checkedAnswer(state: roomState, payload: payloadAnswer) {
-        return new Promise(function (resolve, reject) {
-            console.log('test', payload)
-            if (payload.correct) {
-                let userIndex = state.active.users.findIndex((user) => user._id === payload.user)
-                state.active.users[userIndex].userScore += state.quizz.generated[state.quizz.activeIndex].points
-            }
-            resolve('')
-        })
+        console.log('test check')
+        if (payload.correct) {
+            let userIndex = state.active.users.findIndex((user) => user._id === payload.userId)
+            console.log(userIndex)
+            state.active.users[userIndex].userScore += state.quizz.generated[state.quizz.activeIndex].points
+        }
     },
     nextQuestion(state: roomState) {
         state.quizz.activeIndex++
     },
     endQuizz(state: roomState) {
         state.quizz.activeIndex = 0
-        state.active.users.forEach(user => {
+        state.active?.users.forEach((user) => {
             user.userScore = 0
-        });
+        })
     },
 }
 

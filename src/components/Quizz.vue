@@ -1,11 +1,11 @@
 <template>
     <v-row class="h-100 bg-grey" align="center" justify="center">
         <v-col cols="9">
-            <vue-countdown ref="vueCountdown" :time="countdown" :auto-start="false" @end="verifyAnswer()" v-slot="{ seconds }">
+            <vue-countdown ref="vueCountdown" :auto-start="false" :time="countdown" @end="verifyAnswer()" v-slot="{ seconds }">
                 Time Remaining: {{ seconds }} seconds.
-                <v-progress-linear :model-value="seconds * 20"></v-progress-linear>
+                <v-progress-linear :model-value="seconds * forProgress"></v-progress-linear>
             </vue-countdown>
-            <v-card class="elevation-3">
+            <v-card v-if="ingame" class="elevation-3">
                 <v-card-title>{{ beautify(room.quizz.generated[room.quizz.activeIndex].category) }}</v-card-title>
                 <v-card-subtitle :class="room.quizz.generated[room.quizz.activeIndex].difficultyColorClass"
                     >{{ beautify(room.quizz.generated[room.quizz.activeIndex].difficulty) }}
@@ -31,7 +31,7 @@ import { mapState, mapActions } from 'vuex'
 import Swal from 'sweetalert2'
 import VueCountdown from '@chenfengyuan/vue-countdown'
 import { socket } from '../socket'
-import { ref, defineComponent } from 'vue'
+import { ref, defineComponent, onMounted } from 'vue'
 
 export default defineComponent({
     name: 'quizz',
@@ -42,36 +42,45 @@ export default defineComponent({
     computed: {
         ...mapState(['user', 'room']),
     },
+    setup() {
+        const vueCountdown = ref<InstanceType<typeof VueCountdown>>() // Assign dom object reference to "myinput" variable
+        onMounted(() => {
+            console.log(vueCountdown.value) // Log a DOM object in console
+        })
+        return { vueCountdown } // WILL NOT WORK WITHOUT THIS
+    },
     mounted() {
         socket.on('checked_answer', (payload: Object) => {
             this.checkedAnswer(payload)
-            .then(() => {
-                this.selectedAnswer = ''
-                console.log('quizz lenght',this.room.quizz.generated )
+            console.log(this.vueCountdown)
+            this.selectedAnswer = ''
+            if (this.room.quizz.activeIndex + 1 < this.room.quizz.generated.length && payload.userId === this.user.logged._id) {
+                this.nextQuestion()
+                console.log('next question')
                 console.log('index', this.room.quizz.activeIndex)
-                if (this.room.quizz.activeIndex + 1 < this.room.quizz.generated.length) {
-
-                    this.nextQuestion()
-                    this.$refs.vueCountdown.restart()
-                } else {
-                    const foundUser = this.room.active.users.find((user: User) => user._id === this.user.logged._id)
-                    Swal.fire({
-                        title: 'End of quizz',
-                        text: 'You got ' + foundUser.userScore + ' points',
-                        icon: 'success',
-                        confirmButtonText: 'yay',
-                    })
-                    if(this.room.active.owner === this.user.logged._id){
-                        socket.emit('end_game', {room: this.room.active._id})
-                    }
+                console.log(this.$refs)
+                this.vueCountdown?.start()
+            } else if (this.room.quizz.activeIndex + 1 >= this.room.quizz.generated.length) {
+                const foundUser = this.room.active.users.find((user: User) => user._id === this.user.logged._id)
+                Swal.fire({
+                    title: 'End of quizz',
+                    text: 'You got ' + foundUser.userScore + ' points',
+                    icon: 'success',
+                    confirmButtonText: 'yay',
+                })
+                if (this.room.active.owner === this.user.logged._id) {
+                    socket.emit('end_game', { room: this.room.active._id })
                 }
-            })
+            }
         })
     },
     methods: {
         start() {
-            console.log('test')
-            this.$refs.vueCountdown.start()
+            this.countdown = this.room.quizz.time * 1000
+            //Il faut que ca fasse 100 quand on multiplie par les secondes pour
+            this.forProgress = 100 / this.room.quizz.time
+            this.vueCountdown?.start()
+            this.ingame = true
         },
         verifyAnswer() {
             socket.emit('check_answer', { answer: this.selectedAnswer, user: this.user.logged })
@@ -93,6 +102,8 @@ export default defineComponent({
     data: () => ({
         selectedAnswer: '',
         countdown: 5 * 1000,
+        forProgress: 10,
+        ingame: false,
     }),
 })
 </script>
