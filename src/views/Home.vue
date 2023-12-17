@@ -44,7 +44,7 @@ export default {
         ...mapState(['room']),
         ...mapState(['user']),
         rooms(): Array<Room> {
-            return this.room.all || []; // Assuming 'all' is an array, handle if it's null or undefined
+            return this.room.all || [] // Assuming 'all' is an array, handle if it's null or undefined
         },
     },
     methods: {

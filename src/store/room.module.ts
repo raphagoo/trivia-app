@@ -196,10 +196,10 @@ const mutations = {
     checkedAnswer(state: roomState, payload: payloadAnswer) {
         console.log('test check')
         if (state.active?.users && payload.correct) {
-            const userIndex = state.active.users.findIndex((user) => user._id === payload.userId);
+            const userIndex = state.active.users.findIndex((user) => user._id === payload.userId)
             // Ensure userIndex is not -1 before accessing state.active.users
             if (userIndex !== -1) {
-                state.active.users[userIndex]!.userScore += state.quizz.generated[state.quizz.activeIndex].points;
+                state.active.users[userIndex]!.userScore += state.quizz.generated[state.quizz.activeIndex].points
             }
         }
     },

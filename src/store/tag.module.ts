@@ -30,10 +30,8 @@ const mutations = {
         state.all = []
     },
     getAllTagsSuccess(state: tagState, response: AxiosResponse) {
-        const asArray = Object.entries(response.data);
-        const filtered: [string, unknown][] = asArray.filter(
-            ([, value]: [string, unknown]) => typeof value === 'number' && value >= 30
-        );
+        const asArray = Object.entries(response.data)
+        const filtered: [string, unknown][] = asArray.filter(([, value]: [string, unknown]) => typeof value === 'number' && value >= 30)
         filtered.sort()
         const result = filtered.map(([category, value]) => ({
             category,

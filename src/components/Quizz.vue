@@ -32,7 +32,7 @@ import Swal from 'sweetalert2'
 import VueCountdown from '@chenfengyuan/vue-countdown'
 import { socket } from '../socket'
 import { ref, defineComponent, onMounted } from 'vue'
-import {payloadAnswer, User} from '../types/index'
+import { payloadAnswer, User } from '../types/index'
 
 export default defineComponent({
     name: 'quizz',
