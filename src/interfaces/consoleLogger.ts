@@ -35,8 +35,7 @@ const LOG_LEVELS = ['trace', 'debug', 'info', 'warn', 'error']
 
 const logLevel = LOG_LEVELS.includes(logLevelConf) ? logLevelConf : 'error'
 
-function _log(level: string, ...msg: any) {
-    /* eslint-disable no-console */
+function _log(level: string, ...msg: string[]) {
     if (LOG_LEVELS.indexOf(level) >= LOG_LEVELS.indexOf(logLevel)) {
         switch (level) {
             case 'error':
@@ -53,13 +52,12 @@ function _log(level: string, ...msg: any) {
                 break
         }
     }
-    /* eslint-enable no-console */
 }
 
 export default {
-    trace: (...msg: any) => _log('trace', ...msg),
-    debug: (...msg: any) => _log('debug', ...msg),
-    info: (...msg: any) => _log('info', ...msg),
-    warn: (...msg: any) => _log('warn', ...msg),
-    error: (...msg: any) => _log('error', ...msg),
+    trace: (...msg: string[]) => _log('trace', ...msg),
+    debug: (...msg: string[]) => _log('debug', ...msg),
+    info: (...msg: string[]) => _log('info', ...msg),
+    warn: (...msg: string[]) => _log('warn', ...msg),
+    error: (...msg: string[]) => _log('error', ...msg),
 }

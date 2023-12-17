@@ -7,8 +7,9 @@
             </v-form>
         </v-col>
         <v-col cols="6">
-            <div v-for="room in room.all" :key="room._id">
+            <div v-for="room in rooms" :key="room._id">
                 {{ room.name }} - {{ room.users.length }} users connected
+                <div v-if="room.inGame">En jeu</div>
                 <v-btn @click="toRoom(room._id)">Join</v-btn>
             </div>
         </v-col>
@@ -18,28 +19,33 @@
 <script lang="ts">
 import { mapActions, mapState } from 'vuex'
 import { socket } from '../socket'
-import ConnectionState from '../components/ConnectionState.vue'
-import ConnectionManager from '../components/ConnectionManager.vue'
+import { AxiosResponse } from 'axios'
+import { Room } from '../types/index'
 export default {
     name: 'home',
-    components: {
-        ConnectionManager,
-        ConnectionState,
-    },
     mounted() {
         this.getAllRooms()
-        socket.on('create_room', (payload: Object) => {
+        socket.on('create_room', (payload: object) => {
             this.addRoomToList(payload)
         })
-        socket.on('join_room', (payload: Object) => {
+        socket.on('join_room', (payload: object) => {
             this.addUserToRoom(payload)
         })
-        socket.on('leave_room', (payload: Object) => {
+        socket.on('leave_room', (payload: object) => {
             this.removeUserFromRoom(payload)
         })
     },
+    beforeUnmount() {
+        socket.off('create_room')
+        socket.off('join_room')
+        socket.off('leave_room')
+    },
     computed: {
-        ...mapState(['room', 'user']),
+        ...mapState(['room']),
+        ...mapState(['user']),
+        rooms(): Array<Room> {
+            return this.room.all || [] // Assuming 'all' is an array, handle if it's null or undefined
+        },
     },
     methods: {
         pushRoom() {
@@ -48,11 +54,11 @@ export default {
                     .then(() => {
                         return this.createRoom(this.roomName)
                     })
-                    .then((response: any) => {
+                    .then((response: AxiosResponse) => {
                         socket.emit('create_room', response.data)
                         return this.joinRoom(response.data._id)
                     })
-                    .then((response: any) => {
+                    .then((response: AxiosResponse) => {
                         socket.emit('join_room', {
                             room: response.data._id,
                             user: this.user.logged,
@@ -61,11 +67,11 @@ export default {
                     })
             } else {
                 this.createRoom(this.roomName)
-                    .then((response: any) => {
+                    .then((response: AxiosResponse) => {
                         socket.emit('create_room', response.data)
                         return this.joinRoom(response.data._id)
                     })
-                    .then((response: any) => {
+                    .then((response: AxiosResponse) => {
                         socket.emit('join_room', {
                             room: response.data._id,
                             user: this.user.logged,
@@ -88,7 +94,7 @@ export default {
         ...mapActions('user', {
             createGuestUser: 'createGuestUser',
         }),
-        toRoom(roomId: number) {
+        toRoom(roomId: string) {
             if (localStorage.getItem('token') === null) {
                 this.createGuestUser()
                     .then(() => {

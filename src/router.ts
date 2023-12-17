@@ -23,6 +23,7 @@ export const router = createRouter({
     ],
 })
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 router.beforeEach((to: any, from: any, next: any) => {
     // redirect to login page if not logged in and trying to access a restricted page
     //const publicPages = ['/login', '/register', '/', '/shop', '/product', '/about', '/products'];
