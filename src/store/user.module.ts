@@ -2,6 +2,7 @@ import { Commit } from 'vuex'
 import { AxiosResponse } from 'axios'
 import api from '../interfaces/apiInterface'
 import consoleLogger from '../interfaces/consoleLogger'
+import { userState } from '../types'
 
 const state: userState = { logged: null }
 
@@ -41,7 +42,7 @@ const mutations = {
     },
     createGuestUserError(state: userState, error: AxiosResponse) {
         state.logged = null
-        consoleLogger.error(error)
+        consoleLogger.error(error.data)
     },
     logout(state: userState) {
         state.logged = null

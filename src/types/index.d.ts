@@ -1,19 +1,19 @@
-type tagState = {
+export type tagState = {
     all: Array
 }
 
-type Tag = {
+export type Tag = {
     category: String
     value: number
 }
 
-type Quizz = {
+export type Quizz = {
     generated: Array<Question>
     activeIndex: number
     time: number
 }
 
-type Question = {
+export type Question = {
     category: String
     id: String
     tags: Array
@@ -26,7 +26,7 @@ type Question = {
     difficultyColorClass: String
 }
 
-type roomState = {
+export type roomState = {
     all: Array<Room>
     creating: boolean
     joining: boolean
@@ -34,7 +34,7 @@ type roomState = {
     quizz: Quizz
 }
 
-type Room = {
+export type Room = {
     _id: string
     name: string
     tags: string
@@ -45,23 +45,28 @@ type Room = {
     owner: User
 }
 
-type User = {
+export type User = {
     _id: string
     username: string
     password: string
     userScore: number
 }
 
-type userState = {
+export type userState = {
     logged: ?User
 }
 
-type payloadAnswer = {
+export type payloadAnswer = {
     correct: boolean
     userId: string
 }
 
-type generatedQuizz = {
+export type payloadJoinLeaveRoom = {
+    user: User
+    room: string
+}
+
+export type generatedQuizz = {
     questions: Array<Question>
     time: string
 }

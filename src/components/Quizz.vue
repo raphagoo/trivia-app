@@ -21,7 +21,7 @@
             </v-card>
         </v-col>
         <v-col cols="3">
-            <div v-for="user in room.active.users">{{ user.username }} : {{ user.userScore }}</div>
+            <div v-for="user in room.active.users" :key="user._id">{{ user.username }} : {{ user.userScore }}</div>
         </v-col>
     </v-row>
 </template>
@@ -32,6 +32,7 @@ import Swal from 'sweetalert2'
 import VueCountdown from '@chenfengyuan/vue-countdown'
 import { socket } from '../socket'
 import { ref, defineComponent, onMounted } from 'vue'
+import {payloadAnswer, User} from '../types/index'
 
 export default defineComponent({
     name: 'quizz',
@@ -50,9 +51,8 @@ export default defineComponent({
         return { vueCountdown } // WILL NOT WORK WITHOUT THIS
     },
     mounted() {
-        socket.on('checked_answer', (payload: Object) => {
+        socket.on('checked_answer', (payload: payloadAnswer) => {
             this.checkedAnswer(payload)
-            console.log(this.vueCountdown)
             this.selectedAnswer = ''
             if (this.room.quizz.activeIndex + 1 < this.room.quizz.generated.length && payload.userId === this.user.logged._id) {
                 this.nextQuestion()
@@ -73,6 +73,9 @@ export default defineComponent({
                 }
             }
         })
+    },
+    beforeUnmount() {
+        socket.off('checked_answer')
     },
     methods: {
         start() {

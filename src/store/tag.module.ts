@@ -1,8 +1,8 @@
-import { router } from '../router'
 import consoleLogger from '../interfaces/consoleLogger'
 import api from '../interfaces/apiInterface'
 import { Commit } from 'vuex'
 import { AxiosResponse } from 'axios'
+import { tagState } from '../types'
 
 const state: tagState = { all: [] }
 
@@ -30,8 +30,10 @@ const mutations = {
         state.all = []
     },
     getAllTagsSuccess(state: tagState, response: AxiosResponse) {
-        const asArray = Object.entries(response.data)
-        const filtered = asArray.filter(([key, value]) => value >= 50)
+        const asArray = Object.entries(response.data);
+        const filtered: [string, unknown][] = asArray.filter(
+            ([, value]: [string, unknown]) => typeof value === 'number' && value >= 30
+        );
         filtered.sort()
         const result = filtered.map(([category, value]) => ({
             category,
@@ -40,7 +42,7 @@ const mutations = {
         state.all = result
     },
     getAllTagsError(state: tagState, error: AxiosResponse) {
-        consoleLogger.error(error)
+        consoleLogger.error(error.data)
         state.all = []
     },
 }

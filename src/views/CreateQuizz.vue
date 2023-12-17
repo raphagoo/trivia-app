@@ -1,8 +1,8 @@
 <template>
-    <div v-for="user in activeRoom.users"><span v-if="user._id === activeRoom.owner && !ingame">Owner : </span>{{ user.username }}</div>
+    <div v-for="user in activeRoom.users" :key="user._id"><span v-if="user._id === activeRoom.owner && !ingame">Owner : </span>{{ user.username }}</div>
     <v-row v-if="user.logged._id === activeRoom.owner && !ingame" class="w-75 d-flex">
         <v-col cols="9">
-            <v-select v-model="selected" :items="tag.all" :item-props="itemProps" item-value="category" label="Select categories" multiple persistent-hint></v-select>
+            <v-select v-model="selected" :items="tags" :item-props="itemProps" item-value="category" label="Select categories" multiple persistent-hint></v-select>
             <v-checkbox :disabled="user.logged._id !== activeRoom.owner" class="d-flex w-25" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
             <v-slider label="Secondes par question" :min="5" :max="30" step="5" v-model="selectedTime" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
         </v-col>
@@ -24,15 +24,12 @@ import { ref, onMounted } from 'vue'
 import { mapActions, mapState } from 'vuex'
 import { useRoute } from 'vue-router'
 import { socket } from '../socket'
-import ConnectionState from '../components/ConnectionState.vue'
-import ConnectionManager from '../components/ConnectionManager.vue'
 import Quizz from '../components/Quizz.vue'
+import { Tag, Room, generatedQuizz } from '../types/index'
 
 export default {
     name: 'createQuizz',
     components: {
-        ConnectionManager,
-        ConnectionState,
         Quizz,
     },
     //code obligatoire pour init des child components
@@ -45,8 +42,7 @@ export default {
     },
     watch: {
         selectedDifficulties() {
-            if (this.selectedDifficulties.length === 0) {
-            } else {
+            if (this.selectedDifficulties.length !== 0) {
                 this.selected = []
                 this.getAllTags(this.selectedDifficulties)
             }
@@ -86,18 +82,20 @@ export default {
     },
     computed: {
         ...mapState(['tag', 'user', 'room']),
+        tags(): Array<Tag> {
+            return this.tag.all || []
+        },
         activeRoom() {
             return this.room.all.find((room: Room) => room._id === this.room.active._id)
         },
     },
     mounted() {
         const route = useRoute()
-        this.roomId = route.params.roomId
+        this.roomId = route.params.roomId as string
         socket.on('leave_room', (payload: Object) => {
             this.removeUserFromRoom(payload)
         })
         socket.on('join_room', (payload: Object) => {
-            console.log('user joined')
             this.addUserToRoom(payload)
         })
         socket.on('generate_quizz', (payload: generatedQuizz) => {
@@ -108,13 +106,11 @@ export default {
                 }
             })
         })
-        socket.on('started_game', (payload: Room) => {
-            console.log('game started')
+        socket.on('started_game', () => {
             this.ingame = true
             this.quizzComponent?.start()
         })
-        socket.on('end_game', (payload: Object) => {
-            console.log('game ended')
+        socket.on('end_game', () => {
             this.ingame = false
             this.endQuizz()
         })
@@ -122,6 +118,11 @@ export default {
     },
     beforeUnmount() {
         socket.emit('leave_room', { room: this.roomId, user: this.user.logged })
+        socket.off('join_room')
+        socket.off('generate_quizz')
+        socket.off('started_game')
+        socket.off('end_game')
+        socket.off('leave_room')
     },
     data: () => ({
         selected: [],
