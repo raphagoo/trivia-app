@@ -16,10 +16,9 @@ export type Quizz = {
 export type Question = {
     category: String
     id: String
-    tags: Array
+    tags: Array<Tag>
     difficulty: String
     question: Object
-    answers: Array
     type: String
     answers: Array
     points: number
@@ -58,6 +57,7 @@ export type userState = {
 
 export type payloadAnswer = {
     correct: boolean
+    answerCorrectId: string
     userId: string
 }
 

@@ -1,5 +1,10 @@
 <template>
-    <div v-for="user in activeRoom.users" :key="user._id"><span v-if="user._id === activeRoom.owner && !ingame">Owner : </span>{{ user.username }}</div>
+    <v-row class="w-50 d-flex">
+        <v-col cols="12">
+            <div v-for="user in activeRoom.users" :key="user._id"><span v-if="user._id === activeRoom.owner && !ingame">Owner : </span>{{ user.username }}</div>
+
+        </v-col>
+    </v-row>
     <v-row v-if="user.logged._id === activeRoom.owner && !ingame" class="w-75 d-flex">
         <v-col cols="9">
             <v-select v-model="selected" :items="tags" :item-props="itemProps" item-value="category" label="Select categories" multiple persistent-hint></v-select>
@@ -21,8 +26,8 @@
 
 <script lang="ts">
 import { ref, onMounted } from 'vue'
-import { mapActions, mapState } from 'vuex'
-import { useRoute } from 'vue-router'
+import { mapActions, mapState, useStore } from 'vuex'
+import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import { socket } from '../socket'
 import Quizz from '../components/Quizz.vue'
 import { Tag, Room, generatedQuizz } from '../types/index'
@@ -32,8 +37,13 @@ export default {
     components: {
         Quizz,
     },
-    //code obligatoire pour init des child components
     setup() {
+        onBeforeRouteLeave((to, from, next) => {
+            const store = useStore()
+            socket.emit('leave_room', { room: store.state.room.active._id, user: store.state.user.logged })
+            next()
+        })
+        //code obligatoire pour init des child components
         const quizzComponent = ref<InstanceType<typeof Quizz>>() // Assign dom object reference to "myinput" variable
         onMounted(() => {
             console.log(quizzComponent.value) // Log a DOM object in console
@@ -117,7 +127,6 @@ export default {
         this.getAllTags()
     },
     beforeUnmount() {
-        socket.emit('leave_room', { room: this.roomId, user: this.user.logged })
         socket.off('join_room')
         socket.off('generate_quizz')
         socket.off('started_game')

@@ -14,7 +14,7 @@
                     points</v-card-subtitle
                 >
                 <v-card-text>{{ room.quizz.generated[room.quizz.activeIndex].question }}</v-card-text>
-                <v-card-actions class="justify-center answers" v-for="answer in room.quizz.generated[room.quizz.activeIndex].answers" :key="answer">
+                <v-card-actions class="justify-center answers" :id="answer._id" v-for="answer in room.quizz.generated[room.quizz.activeIndex].answers" :key="answer">
                     <v-checkbox-btn :value="answer" v-model="selectedAnswer"></v-checkbox-btn>
                     <div class="w-80">{{ answer.answer }}</div>
                 </v-card-actions>
@@ -53,25 +53,30 @@ export default defineComponent({
     mounted() {
         socket.on('checked_answer', (payload: payloadAnswer) => {
             this.checkedAnswer(payload)
-            this.selectedAnswer = ''
-            if (this.room.quizz.activeIndex + 1 < this.room.quizz.generated.length && payload.userId === this.user.logged._id) {
-                this.nextQuestion()
-                console.log('next question')
-                console.log('index', this.room.quizz.activeIndex)
-                console.log(this.$refs)
-                this.vueCountdown?.start()
-            } else if (this.room.quizz.activeIndex + 1 >= this.room.quizz.generated.length) {
-                const foundUser = this.room.active.users.find((user: User) => user._id === this.user.logged._id)
-                Swal.fire({
-                    title: 'End of quizz',
-                    text: 'You got ' + foundUser.userScore + ' points',
-                    icon: 'success',
-                    confirmButtonText: 'yay',
-                })
-                if (this.room.active.owner === this.user.logged._id) {
-                    socket.emit('end_game', { room: this.room.active._id })
-                }
+            document.getElementById(payload.answerCorrectId)?.classList.add('bg-success')
+            if(payload.answerCorrectId !== this.selectedAnswer._id) {
+                console.log(document.getElementById(this.selectedAnswer._id))
+                document.getElementById(this.selectedAnswer._id)?.classList.add('bg-error')
             }
+            this.selectedAnswer = {_id: '0', answer: ''}
+            setTimeout(() => {
+                if (this.room.quizz.activeIndex + 1 < this.room.quizz.generated.length && payload.userId === this.user.logged._id) {
+                    this.nextQuestion()
+                    this.vueCountdown?.start()
+                } else if (this.room.quizz.activeIndex + 1 >= this.room.quizz.generated.length) {
+                    console.log(this.room.quizz.activeIndex)
+                    const foundUser = this.room.active.users.find((user: User) => user._id === this.user.logged._id)
+                    Swal.fire({
+                        title: 'End of quizz',
+                        text: 'You got ' + foundUser.userScore + ' points',
+                        icon: 'success',
+                        confirmButtonText: 'yay',
+                    })
+                    if (this.room.active.owner === this.user.logged._id) {
+                        socket.emit('end_game', { room: this.room.active._id })
+                    }
+                }
+            }, 3000)
         })
     },
     beforeUnmount() {
@@ -103,7 +108,7 @@ export default defineComponent({
         }),
     },
     data: () => ({
-        selectedAnswer: '',
+        selectedAnswer: {_id: '0', answer: ''},
         countdown: 5 * 1000,
         forProgress: 10,
         ingame: false,

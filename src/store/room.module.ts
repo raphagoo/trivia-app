@@ -125,9 +125,6 @@ const mutations = {
         }
     },
     checkRoomPopulation(state: roomState) {
-        state.all.forEach((room) => {
-            console.log(room)
-        })
         state.all = state.all.filter((room) => room.users.length > 0)
     },
     createRoomRequest(state: roomState) {
