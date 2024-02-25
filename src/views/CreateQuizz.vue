@@ -1,15 +1,23 @@
 <template>
-    <div v-for="user in activeRoom.users" :key="user._id"><span v-if="user._id === activeRoom.owner && !ingame">Owner : </span>{{ user.username }}</div>
-    <v-row v-if="user.logged._id === activeRoom.owner && !ingame" class="w-75 d-flex">
-        <v-col cols="9">
-            <v-select v-model="selected" :items="tags" :item-props="itemProps" item-value="category" label="Select categories" multiple persistent-hint></v-select>
-            <v-checkbox :disabled="user.logged._id !== activeRoom.owner" class="d-flex w-25" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
-            <v-slider label="Secondes par question" :min="5" :max="30" step="5" v-model="selectedTime" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
+    <v-row class="w-50 d-flex">
+        <v-col cols="12">
+            <div v-for="user in activeRoom.users" :key="user._id"><v-icon color="warning" icon="mdi-crown" v-if="user._id === activeRoom.owner && !ingame"></v-icon>{{ user.username }}</div>
         </v-col>
     </v-row>
-    <v-row v-if="user.logged._id === activeRoom.owner && !ingame" class="w-25 d-flex">
-        <v-col cols="12">
-            <v-btn @click="getQuizz()">Create Quizz</v-btn>
+    <v-row v-if="user.logged._id === activeRoom.owner && !ingame" class="w-75 d-flex">
+        <v-col cols="9">
+            <v-card outlined>
+                <v-card-title class="d-flex bg-blue">Create a quizz</v-card-title>
+                <v-select class="mt-4 pl-5 pr-5" v-model="selected" :items="tags" :item-props="itemProps" item-value="category" label="Select categories" multiple persistent-hint></v-select>
+                <div class="">
+                    <span class="text-subtitle-1 pl-5">Pick difficulties</span>
+                    <v-checkbox :disabled="user.logged._id !== activeRoom.owner" class="d-flex w-50 pl-5" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
+                </div>
+                <v-slider class="w-75 pl-5" label="Secondes par question" :min="5" :max="30" step="5" v-model="selectedTime" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
+                <v-card-actions class="d-flex justify-center">
+                    <v-btn class="bg-success mb-5" @click="getQuizz()">Start !</v-btn>
+                </v-card-actions>
+            </v-card>
         </v-col>
     </v-row>
     <v-row v-show="ingame">
@@ -21,8 +29,8 @@
 
 <script lang="ts">
 import { ref, onMounted } from 'vue'
-import { mapActions, mapState } from 'vuex'
-import { useRoute } from 'vue-router'
+import { mapActions, mapState, useStore } from 'vuex'
+import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import { socket } from '../socket'
 import Quizz from '../components/Quizz.vue'
 import { Tag, Room, generatedQuizz } from '../types/index'
@@ -32,8 +40,13 @@ export default {
     components: {
         Quizz,
     },
-    //code obligatoire pour init des child components
     setup() {
+        onBeforeRouteLeave((to, from, next) => {
+            const store = useStore()
+            socket.emit('leave_room', { room: store.state.room.active._id, user: store.state.user.logged })
+            next()
+        })
+        //code obligatoire pour init des child components
         const quizzComponent = ref<InstanceType<typeof Quizz>>() // Assign dom object reference to "myinput" variable
         onMounted(() => {
             console.log(quizzComponent.value) // Log a DOM object in console
@@ -117,7 +130,6 @@ export default {
         this.getAllTags()
     },
     beforeUnmount() {
-        socket.emit('leave_room', { room: this.roomId, user: this.user.logged })
         socket.off('join_room')
         socket.off('generate_quizz')
         socket.off('started_game')
@@ -126,8 +138,8 @@ export default {
     },
     data: () => ({
         selected: [],
-        difficulties: ['easy', 'medium', 'hard'],
-        selectedDifficulties: ['easy', 'medium', 'hard'],
+        difficulties: ['Easy', 'Medium', 'Hard'],
+        selectedDifficulties: ['Easy', 'Medium', 'Hard'],
         selectedTime: 10,
         roomId: '',
         ingame: false,

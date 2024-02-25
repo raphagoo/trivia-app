@@ -77,6 +77,9 @@ const actions = {
                 })
         })
     },
+    updateRoom({ commit }: { commit: Commit }, payload: Object) {
+        commit('updateRoom', payload)
+    },
     generateQuizz({ commit }: { commit: Commit }, { content }: { content: generatedQuizz }) {
         commit('generateQuizz', content)
     },
@@ -125,9 +128,6 @@ const mutations = {
         }
     },
     checkRoomPopulation(state: roomState) {
-        state.all.forEach((room) => {
-            console.log(room)
-        })
         state.all = state.all.filter((room) => room.users.length > 0)
     },
     createRoomRequest(state: roomState) {
@@ -160,6 +160,12 @@ const mutations = {
     getAllRoomsError(state: roomState, error: AxiosResponse) {
         consoleLogger.error(error.data)
         state.all = []
+    },
+    updateRoom(state: roomState, payload: Room) {
+        const roomIndex = state.all.findIndex((room) => room._id === payload._id)
+        if (roomIndex !== -1) {
+            state.all[roomIndex] = payload
+        }
     },
     generateQuizzRequest(state: roomState) {
         state.quizz.generated = []
