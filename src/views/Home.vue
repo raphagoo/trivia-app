@@ -1,17 +1,26 @@
 <template>
-    <v-row>
-        <v-col cols="6">
-            <v-form @submit.prevent="pushRoom()">
-                <v-text-field v-model="roomName" label="Room Name"></v-text-field>
-                <v-btn type="submit" block class="mt-2">Host</v-btn>
-            </v-form>
+    <v-row class="justify-center align-start">
+        <v-col cols="4">
+            <v-card>
+                <v-card-title class="bg-grey d-flex align-center"><v-icon icon="mdi-crown"></v-icon><span class="pl-2">Host a room</span></v-card-title>
+                <v-form @submit.prevent="pushRoom()">
+                    <v-text-field class="pa-4" v-model="roomName" label="Room Name"></v-text-field>
+                    <v-btn type="submit" block class="mt-1 bg-green w-75">Create</v-btn>
+                </v-form>
+            </v-card>
         </v-col>
-        <v-col cols="6">
-            <div v-for="room in rooms" :key="room._id">
-                {{ room.name }} - {{ room.users.length }} users connected
-                <div v-if="room.inGame">En jeu</div>
-                <v-btn @click="toRoom(room._id)">Join</v-btn>
-            </div>
+        <v-col cols="7">
+            <v-card>
+                <v-card-title class="bg-grey d-flex align-center"><v-icon icon="mdi-account-group"></v-icon><span class="pl-2">Join a room</span></v-card-title>
+                <div v-for="room in rooms" :key="room._id">
+                    <div class="pa-3">
+                        {{ room.name }} - {{ room.users.length }} users connected
+                        <div v-if="room.inGame">En jeu</div>
+                        <v-btn class="bg-green" v-if="!room.inGame" @click="toRoom(room._id)">Join</v-btn>
+                    </div>
+                    <v-divider></v-divider>
+                </div>
+            </v-card>
         </v-col>
     </v-row>
 </template>
@@ -34,11 +43,18 @@ export default {
         socket.on('leave_room', (payload: object) => {
             this.removeUserFromRoom(payload)
         })
+        socket.on('started_game', (payload: object) => {
+            this.updateRoom(payload)
+        })
+        socket.on('end_game', (payload: object) => {
+            this.updateRoom(payload)
+        })
     },
     beforeUnmount() {
         socket.off('create_room')
         socket.off('join_room')
         socket.off('leave_room')
+        socket.off('started_game')
     },
     computed: {
         ...mapState(['room']),
@@ -90,6 +106,7 @@ export default {
             joinRoom: 'joinRoom',
             addUserToRoom: 'addUserToRoom',
             removeUserFromRoom: 'removeUserFromRoom',
+            updateRoom: 'updateRoom',
         }),
         ...mapActions('user', {
             createGuestUser: 'createGuestUser',

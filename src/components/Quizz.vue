@@ -54,11 +54,11 @@ export default defineComponent({
         socket.on('checked_answer', (payload: payloadAnswer) => {
             this.checkedAnswer(payload)
             document.getElementById(payload.answerCorrectId)?.classList.add('bg-success')
-            if(payload.answerCorrectId !== this.selectedAnswer._id) {
+            if (payload.answerCorrectId !== this.selectedAnswer._id) {
                 console.log(document.getElementById(this.selectedAnswer._id))
                 document.getElementById(this.selectedAnswer._id)?.classList.add('bg-error')
             }
-            this.selectedAnswer = {_id: '0', answer: ''}
+            this.selectedAnswer = { _id: '0', answer: '' }
             setTimeout(() => {
                 if (this.room.quizz.activeIndex + 1 < this.room.quizz.generated.length && payload.userId === this.user.logged._id) {
                     this.nextQuestion()
@@ -85,13 +85,13 @@ export default defineComponent({
     methods: {
         start() {
             this.countdown = this.room.quizz.time * 1000
-            //Il faut que ca fasse 100 quand on multiplie par les secondes pour
+            //Il faut que ca fasse 100 quand on multiplie par les secondes pour avoir un pourcentage
             this.forProgress = 100 / this.room.quizz.time
             this.vueCountdown?.start()
             this.ingame = true
         },
         verifyAnswer() {
-            socket.emit('check_answer', { answer: this.selectedAnswer, user: this.user.logged })
+            socket.emit('check_answer', { answer: this.selectedAnswer, user: this.user.logged, question: this.room.quizz.generated[this.room.quizz.activeIndex] })
         },
         beautify(name: String) {
             // Split the input string by underscores
@@ -108,7 +108,7 @@ export default defineComponent({
         }),
     },
     data: () => ({
-        selectedAnswer: {_id: '0', answer: ''},
+        selectedAnswer: { _id: '0', answer: '' },
         countdown: 5 * 1000,
         forProgress: 10,
         ingame: false,
