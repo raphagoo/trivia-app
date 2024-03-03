@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Home from './views/Home.vue'
 import CreateQuizz from './views/CreateQuizz.vue'
+import Authentication from './views/Authentication.vue'
 
 export const router = createRouter({
     history: createWebHistory(),
@@ -10,6 +11,11 @@ export const router = createRouter({
             path: '/',
             name: 'home',
             component: Home,
+        },
+        {
+            path: '/authentication',
+            name: 'authentication',
+            component: Authentication,
         },
         {
             path: '/room/:roomId',
