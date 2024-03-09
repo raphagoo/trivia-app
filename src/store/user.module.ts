@@ -3,10 +3,31 @@ import { AxiosResponse } from 'axios'
 import api from '../interfaces/apiInterface'
 import consoleLogger from '../interfaces/consoleLogger'
 import { userState } from '../types'
+import { router } from '../router'
 
 const state: userState = { logged: null }
 
 const actions = {
+    register({ commit }: { commit: Commit }, user: { name: string; password: string }) {
+        commit('registerRequest')
+        api.post('/user/register', user, { headers: { Accept: 'application/json' } })
+            .then((response) => {
+                commit('registerSuccess', response)
+            })
+            .catch((error) => {
+                commit('registerError', error)
+            })
+    },
+    login({ commit }: { commit: Commit }, user: { email: string; password: string }) {
+        commit('loginRequest')
+        api.post('/user/login', user, { headers: { Accept: 'application/json' } })
+            .then((response) => {
+                commit('loginSuccess', response)
+            })
+            .catch((error) => {
+                commit('loginError', error)
+            })
+    },
     createGuestUser({ commit }: { commit: Commit }) {
         return new Promise(function (resolve, reject) {
             commit('createGuestUserRequest')
@@ -33,6 +54,32 @@ const actions = {
 }
 
 const mutations = {
+    registerRequest(state: userState) {
+        state.logged = null
+    },
+    registerSuccess(state: userState, response: AxiosResponse) {
+        state.logged = response.data.user
+        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('refreshToken', response.data.refresh)
+        router.push({ name: 'home' })
+    },
+    registerError(state: userState, error: AxiosResponse) {
+        state.logged = null
+        consoleLogger.error(error.data)
+    },
+    loginRequest(state: userState) {
+        state.logged = null
+    },
+    loginSuccess(state: userState, response: AxiosResponse) {
+        state.logged = response.data.user
+        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('refreshToken', response.data.refresh)
+        router.push({ name: 'home' })
+    },
+    loginError(state: userState, error: AxiosResponse) {
+        state.logged = null
+        consoleLogger.error(error.data)
+    },
     createGuestUserRequest(state: userState) {
         state.logged = null
     },
@@ -45,8 +92,11 @@ const mutations = {
         consoleLogger.error(error.data)
     },
     logout(state: userState) {
-        state.logged = null
-        localStorage.removeItem('token')
+        router.push({ name: 'home' }).then(() => {
+            state.logged = null
+            localStorage.removeItem('token')
+            localStorage.removeItem('refreshToken')
+        })
     },
 }
 

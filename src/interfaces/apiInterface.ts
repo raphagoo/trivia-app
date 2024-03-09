@@ -1,14 +1,15 @@
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import { router } from '../router'
 import { default as $log } from '../interfaces/consoleLogger'
 const api = axios.create({
     baseURL: import.meta.env.VITE_NODE_API_URL,
 })
 api.interceptors.request.use(
     (config) => {
-        $log.info('api.interceptors.request')
-        if (localStorage.getItem('token') !== null) {
+        $log.info('Request intercepted')
+        if (config.url === '/user/refresh' && localStorage.getItem('refreshToken') !== null) {
+            config.headers.Authorization = 'Bearer ' + localStorage.getItem('refreshToken')
+        } else if (localStorage.getItem('token') !== null) {
             config.headers.Authorization = 'Bearer ' + localStorage.getItem('token')
         }
         return config
@@ -23,20 +24,25 @@ api.interceptors.response.use(
         return response
     },
     function (error) {
-        $log.debug('test' + error)
-        if (401 === error.response.status) {
-            Swal.fire({
-                title: 'Session Expired',
-                text: 'Your session has expired. Would you like to be redirected to the login page?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#DD6B55',
-                confirmButtonText: 'Yes',
-            }).then((result) => {
-                if (result.value) {
-                    router.push('/home/login')
-                }
-            })
+        const originalRequest = error.config
+        if (401 === error.response.status && !originalRequest._retry) {
+            originalRequest._retry = true
+            api.post('/user/refresh', {}, { headers: { Accept: 'application/json' } })
+                .then((res) => {
+                    if (res.status === 200) {
+                        localStorage.setItem('token', res.data.token)
+                        return api(originalRequest)
+                    }
+                })
+                .catch((err) => {
+                    Swal.fire({
+                        title: 'Session Expired',
+                        icon: 'error',
+                    })
+                    localStorage.clear()
+                    window.location.href = '/'
+                    return Promise.reject(err)
+                })
         } else if (403 === error.response.status) {
             Swal.fire({
                 title: 'Forbidden',
