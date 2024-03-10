@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import Home from './views/Home.vue'
-import CreateQuizz from './views/CreateQuizz.vue'
+import Room from './views/Room.vue'
 import Authentication from './views/Authentication.vue'
 
 export const router = createRouter({
@@ -19,8 +19,8 @@ export const router = createRouter({
         },
         {
             path: '/room/:roomId',
-            name: 'createQuizz',
-            component: CreateQuizz,
+            name: 'room',
+            component: Room,
         },
         {
             path: '/:pathMatch(.*)*',
