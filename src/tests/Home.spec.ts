@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import Home from '../views/Home.vue'
+import Home from '../views/CreateQuizz.vue'
 
 describe('HelloWorld', () => {
     it('should have home class', () => {

@@ -6,15 +6,15 @@
                 <v-progress-linear :model-value="seconds * forProgress"></v-progress-linear>
             </vue-countdown>
             <v-card v-if="ingame" class="elevation-3">
-                <v-card-title>Question - {{ beautify(room.quizz.current.category) }}</v-card-title>
-                <v-card-subtitle :class="room.quizz.current.difficultyColorClass"
-                    >{{ beautify(room.quizz.current.difficulty) }}
+                <v-card-title>{{ beautify(room.quizz.generated[room.quizz.activeIndex].category) }}</v-card-title>
+                <v-card-subtitle :class="room.quizz.generated[room.quizz.activeIndex].difficultyColorClass"
+                    >{{ beautify(room.quizz.generated[room.quizz.activeIndex].difficulty) }}
                     -
-                    {{ room.quizz.current.points }}
+                    {{ room.quizz.generated[room.quizz.activeIndex].points }}
                     points</v-card-subtitle
                 >
-                <v-card-text>{{ room.quizz.current.question }}</v-card-text>
-                <v-card-actions class="justify-center answers" :id="answer._id" v-for="answer in room.quizz.current.answers" :key="answer">
+                <v-card-text>{{ room.quizz.generated[room.quizz.activeIndex].question }}</v-card-text>
+                <v-card-actions class="justify-center answers" :id="answer._id" v-for="answer in room.quizz.generated[room.quizz.activeIndex].answers" :key="answer">
                     <v-checkbox-btn :value="answer" v-model="selectedAnswer"></v-checkbox-btn>
                     <div class="w-80">{{ answer.answer }}</div>
                 </v-card-actions>
@@ -32,7 +32,7 @@ import Swal from 'sweetalert2'
 import VueCountdown from '@chenfengyuan/vue-countdown'
 import { socket } from '../socket'
 import { ref, defineComponent, onMounted } from 'vue'
-import { payloadAnswer, Room, User } from '../types/index'
+import { payloadAnswer, User } from '../types/index'
 
 export default defineComponent({
     name: 'quizz',
@@ -53,17 +53,18 @@ export default defineComponent({
     mounted() {
         socket.on('checked_answer', (payload: payloadAnswer) => {
             this.checkedAnswer(payload)
-            const foundUser = this.room.active.users.find((user: User) => user._id === this.user.logged._id)
-            if (payload.userId === foundUser._id) {
-                document.getElementById(payload.answerCorrectId)?.classList.add('bg-success')
-                if (payload.answerCorrectId !== this.selectedAnswer._id) {
-                    document.getElementById(this.selectedAnswer._id)?.classList.add('bg-error')
-                }
-                this.selectedAnswer = { _id: '0', answer: '' }
+            document.getElementById(payload.answerCorrectId)?.classList.add('bg-success')
+            if (payload.answerCorrectId !== this.selectedAnswer._id) {
+                console.log(document.getElementById(this.selectedAnswer._id))
+                document.getElementById(this.selectedAnswer._id)?.classList.add('bg-error')
             }
-        }),
-            socket.on('next_question', (payload: Room) => {
-                if (payload.inGame === false) {
+            this.selectedAnswer = { _id: '0', answer: '' }
+            setTimeout(() => {
+                if (this.room.quizz.activeIndex + 1 < this.room.quizz.generated.length && payload.userId === this.user.logged._id) {
+                    this.nextQuestion()
+                    this.vueCountdown?.start()
+                } else if (this.room.quizz.activeIndex + 1 >= this.room.quizz.generated.length) {
+                    console.log(this.room.quizz.activeIndex)
                     const foundUser = this.room.active.users.find((user: User) => user._id === this.user.logged._id)
                     Swal.fire({
                         title: 'End of quizz',
@@ -74,32 +75,23 @@ export default defineComponent({
                     if (this.room.active.owner === this.user.logged._id) {
                         socket.emit('end_game', { room: this.room.active._id })
                     }
-                } else {
-                    this.nextQuestion(payload)
-                    this.vueCountdown?.start()
                 }
-            })
+            }, 3000)
+        })
     },
     beforeUnmount() {
         socket.off('checked_answer')
     },
     methods: {
         start() {
-            this.getQuestion(this.room.active._id).then(() => {
-                this.countdown = this.room.active.time * 1000
-                //Il faut que ca fasse 100 quand on multiplie par les secondes pour avoir un pourcentage
-                this.forProgress = 100
-                this.vueCountdown?.start()
-                this.ingame = true
-            })
+            this.countdown = this.room.quizz.time * 1000
+            //Il faut que ca fasse 100 quand on multiplie par les secondes pour avoir un pourcentage
+            this.forProgress = 100 / this.room.quizz.time
+            this.vueCountdown?.start()
+            this.ingame = true
         },
         verifyAnswer() {
-            socket.emit('check_answer', { answer: this.selectedAnswer, user: this.user.logged, question: this.room.quizz.current })
-            if (this.room.active.owner === this.user.logged._id) {
-                setTimeout(() => {
-                    socket.emit('next_question', { room: this.room.active._id })
-                }, 5000)
-            }
+            socket.emit('check_answer', { answer: this.selectedAnswer, user: this.user.logged, question: this.room.quizz.generated[this.room.quizz.activeIndex] })
         },
         beautify(name: String) {
             // Split the input string by underscores
@@ -113,7 +105,6 @@ export default defineComponent({
         ...mapActions('room', {
             nextQuestion: 'nextQuestion',
             checkedAnswer: 'checkedAnswer',
-            getQuestion: 'getQuestion',
         }),
     },
     data: () => ({

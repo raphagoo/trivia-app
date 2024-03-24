@@ -2,9 +2,9 @@ import consoleLogger from '../interfaces/consoleLogger'
 import api from '../interfaces/apiInterface'
 import { Commit } from 'vuex'
 import { AxiosResponse } from 'axios'
-import { roomState, Room, payloadAnswer, payloadJoinLeaveRoom, Question } from '../types'
+import { roomState, generatedQuizz, Room, Question, User, payloadAnswer, payloadJoinLeaveRoom } from '../types'
 
-const state: roomState = { all: [], creating: false, joining: false, quizz: { time: 10, current: null, activeIndex: 0 }, active: null }
+const state: roomState = { all: [], creating: false, joining: false, quizz: { time: 10, generated: [], activeIndex: 0 }, active: null }
 
 const actions = {
     addRoomToList({ commit }: { commit: Commit }, payload: Object) {
@@ -80,27 +80,14 @@ const actions = {
     updateRoom({ commit }: { commit: Commit }, payload: Object) {
         commit('updateRoom', payload)
     },
-    generateQuizz({ commit }: { commit: Commit }, { room }: { room: Room }) {
-        commit('generateQuizz', room)
+    generateQuizz({ commit }: { commit: Commit }, { content }: { content: generatedQuizz }) {
+        commit('generateQuizz', content)
     },
     checkedAnswer({ commit }: { commit: Commit }, payload: Object) {
         commit('checkedAnswer', payload)
     },
-    getQuestion({ commit }: { commit: Commit }, payload: string) {
-        return new Promise(function (resolve, reject) {
-            api.get('/question/' + payload, { headers: { Accept: 'application/json' } })
-                .then((response) => {
-                    commit('getQuestionSuccess', response.data)
-                    resolve(response.data)
-                })
-                .catch((error) => {
-                    commit('getQuestionError', error)
-                    reject(error)
-                })
-        })
-    },
-    nextQuestion({ commit }: { commit: Commit }, payload: { room: Room; question: Question }) {
-        commit('nextQuestionSuccess', payload)
+    nextQuestion({ commit }: { commit: Commit }) {
+        commit('nextQuestion')
     },
     endQuizz({ commit }: { commit: Commit }) {
         commit('endQuizz')
@@ -181,69 +168,49 @@ const mutations = {
         }
     },
     generateQuizzRequest(state: roomState) {
-        state.quizz.current = null
+        state.quizz.generated = []
     },
-    generateQuizz(state: roomState, room: Room) {
-        if (state.active) {
-            const users = state.active?.users
-            state.active = room
-            state.active.users = users
-        }
+    generateQuizz(state: roomState, content: generatedQuizz) {
+        console.log(content.questions)
+        content.questions.forEach((question: Question) => {
+            switch (question.difficulty) {
+                case 'easy':
+                    question.points = 10
+                    question.difficultyColorClass = 'text-green'
+                    break
+                case 'medium':
+                    question.points = 20
+                    question.difficultyColorClass = 'text-orange'
+                    break
+                case 'hard':
+                    question.points = 30
+                    question.difficultyColorClass = 'text-red'
+                    break
+            }
+        })
+        state.quizz.time = parseInt(content.time)
+        state.quizz.generated = content.questions
+        state.quizz.activeIndex = 0
+        state.active?.users.forEach((user: User) => {
+            user.userScore = 0
+        })
     },
     generateQuizzError(state: roomState, error: AxiosResponse) {
         consoleLogger.error(error.data)
-        state.quizz.current = null
+        state.quizz.generated = []
     },
     checkedAnswer(state: roomState, payload: payloadAnswer) {
+        console.log('test check')
         if (state.active?.users && payload.correct) {
             const userIndex = state.active.users.findIndex((user) => user._id === payload.userId)
             // Ensure userIndex is not -1 before accessing state.active.users
-            if (userIndex !== -1 && state.quizz.current !== null) {
-                state.active.users[userIndex]!.userScore += state.quizz.current.points
+            if (userIndex !== -1) {
+                state.active.users[userIndex]!.userScore += state.quizz.generated[state.quizz.activeIndex].points
             }
         }
     },
-    getQuestionSuccess(state: roomState, data: Question) {
-        switch (data.difficulty) {
-            case 'easy':
-                data.points = 10
-                data.difficultyColorClass = 'text-green'
-                break
-            case 'medium':
-                data.points = 20
-                data.difficultyColorClass = 'text-orange'
-                break
-            case 'hard':
-                data.points = 30
-                data.difficultyColorClass = 'text-red'
-                break
-        }
-        state.quizz.current = data
-    },
-    getQuestionError(state: roomState, error: AxiosResponse) {
-        state.quizz.current = null
-        consoleLogger.error(error.data)
-    },
-    nextQuestionSuccess(state: roomState, payload: { room: Room; question: Question }) {
-        switch (payload.question.difficulty) {
-            case 'easy':
-                payload.question.points = 10
-                payload.question.difficultyColorClass = 'text-green'
-                break
-            case 'medium':
-                payload.question.points = 20
-                payload.question.difficultyColorClass = 'text-orange'
-                break
-            case 'hard':
-                payload.question.points = 30
-                payload.question.difficultyColorClass = 'text-red'
-                break
-        }
-        if (state.active) {
-            state.active.currentQuestion = payload.room.currentQuestion
-            state.active.currentIndex = payload.room.currentIndex
-        }
-        state.quizz.current = payload.question
+    nextQuestion(state: roomState) {
+        state.quizz.activeIndex++
     },
     endQuizz(state: roomState) {
         state.quizz.activeIndex = 0
