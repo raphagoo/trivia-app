@@ -3,26 +3,26 @@ export type tagState = {
 }
 
 export type Tag = {
-    category: string
+    category: String
     value: number
 }
 
 export type Quizz = {
-    current: ?Question
+    generated: Array<Question>
     activeIndex: number
     time: number
 }
 
 export type Question = {
-    category: string
-    _id: string
+    category: String
+    id: String
     tags: Array<Tag>
-    difficulty: string
+    difficulty: String
     question: Object
-    type: string
+    type: String
     answers: Array
     points: number
-    difficultyColorClass: string
+    difficultyColorClass: String
 }
 
 export type roomState = {
@@ -42,8 +42,6 @@ export type Room = {
     difficulties: string
     users: Array<User>
     owner: User
-    currentQuestion: Question
-    currentIndex: number
 }
 
 export type User = {
@@ -71,11 +69,4 @@ export type payloadJoinLeaveRoom = {
 export type generatedQuizz = {
     questions: Array<Question>
     time: string
-}
-
-export type Answer = {
-    _id: string
-    correct: boolean
-    answer: string
-    question: Question
 }
