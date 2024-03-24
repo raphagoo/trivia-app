@@ -43,6 +43,7 @@ export type Room = {
     users: Array<User>
     owner: User
     currentQuestion: Question
+    currentIndex: number
 }
 
 export type User = {

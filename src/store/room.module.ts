@@ -99,8 +99,8 @@ const actions = {
                 })
         })
     },
-    nextQuestion({ commit }: { commit: Commit }, payload: Room) {
-        commit('nextQuestion', payload)
+    nextQuestion({ commit }: { commit: Commit }, payload: { room: Room, question: Question }) {
+        commit('nextQuestionSuccess', payload)
     },
     endQuizz({ commit }: { commit: Commit }) {
         commit('endQuizz')
@@ -184,8 +184,11 @@ const mutations = {
         state.quizz.current = null
     },
     generateQuizz(state: roomState, room: Room) {
-        console.log(room)
-        state.active = room
+        if(state.active) {
+            const users = state.active?.users
+            state.active = room
+            state.active.users = users
+        }
     },
     generateQuizzError(state: roomState, error: AxiosResponse) {
         consoleLogger.error(error.data)
@@ -221,8 +224,26 @@ const mutations = {
         state.quizz.current = null
         consoleLogger.error(error.data)
     },
-    nextQuestion(state: roomState, payload: Room) {
-        state.quizz.current = payload.currentQuestion
+    nextQuestionSuccess(state: roomState, payload: { room: Room, question: Question }) {
+        switch (payload.question.difficulty) {
+            case 'easy':
+                payload.question.points = 10
+                payload.question.difficultyColorClass = 'text-green'
+                break
+            case 'medium':
+                payload.question.points = 20
+                payload.question.difficultyColorClass = 'text-orange'
+                break
+            case 'hard':
+                payload.question.points = 30
+                payload.question.difficultyColorClass = 'text-red'
+                break
+        }
+        if (state.active) {
+            state.active.currentQuestion = payload.room.currentQuestion
+            state.active.currentIndex = payload.room.currentIndex
+        }
+        state.quizz.current = payload.question
     },
     endQuizz(state: roomState) {
         state.quizz.activeIndex = 0

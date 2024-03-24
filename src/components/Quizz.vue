@@ -6,7 +6,7 @@
                 <v-progress-linear :model-value="seconds * forProgress"></v-progress-linear>
             </vue-countdown>
             <v-card v-if="ingame" class="elevation-3">
-                <v-card-title>{{ beautify(room.quizz.current.category) }}</v-card-title>
+                <v-card-title>Question - {{ beautify(room.quizz.current.category) }}</v-card-title>
                 <v-card-subtitle :class="room.quizz.current.difficultyColorClass"
                     >{{ beautify(room.quizz.current.difficulty) }}
                     -
@@ -86,9 +86,9 @@ export default defineComponent({
     methods: {
         start() {
             this.getQuestion(this.room.active._id).then(() => {
-                this.countdown = this.room.quizz.time * 1000
+                this.countdown = this.room.active.time * 1000
                 //Il faut que ca fasse 100 quand on multiplie par les secondes pour avoir un pourcentage
-                this.forProgress = 100 / this.room.quizz.time
+                this.forProgress = 100
                 this.vueCountdown?.start()
                 this.ingame = true
             })
