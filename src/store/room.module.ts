@@ -99,7 +99,7 @@ const actions = {
                 })
         })
     },
-    nextQuestion({ commit }: { commit: Commit }, payload: { room: Room, question: Question }) {
+    nextQuestion({ commit }: { commit: Commit }, payload: { room: Room; question: Question }) {
         commit('nextQuestionSuccess', payload)
     },
     endQuizz({ commit }: { commit: Commit }) {
@@ -184,7 +184,7 @@ const mutations = {
         state.quizz.current = null
     },
     generateQuizz(state: roomState, room: Room) {
-        if(state.active) {
+        if (state.active) {
             const users = state.active?.users
             state.active = room
             state.active.users = users
@@ -224,7 +224,7 @@ const mutations = {
         state.quizz.current = null
         consoleLogger.error(error.data)
     },
-    nextQuestionSuccess(state: roomState, payload: { room: Room, question: Question }) {
+    nextQuestionSuccess(state: roomState, payload: { room: Room; question: Question }) {
         switch (payload.question.difficulty) {
             case 'easy':
                 payload.question.points = 10
