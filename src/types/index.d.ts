@@ -55,6 +55,13 @@ export type User = {
 
 export type userState = {
     logged: ?User
+    register: errorState
+    login: errorState
+}
+
+export type errorState = {
+    error: boolean
+    message: string
 }
 
 export type payloadAnswer = {

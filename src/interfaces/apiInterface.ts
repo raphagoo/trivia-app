@@ -27,7 +27,8 @@ api.interceptors.response.use(
         const originalRequest = error.config
         if (401 === error.response.status && !originalRequest._retry) {
             originalRequest._retry = true
-            api.post('/user/refresh', {}, { headers: { Accept: 'application/json' } })
+            return api
+                .post('/user/refresh', {}, { headers: { Accept: 'application/json' } })
                 .then((res) => {
                     if (res.status === 200) {
                         localStorage.setItem('token', res.data.token)
