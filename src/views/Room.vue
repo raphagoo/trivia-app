@@ -1,39 +1,41 @@
 <template>
-    <v-row class="w-50 d-flex">
-        <v-col cols="12">
-            Liste des joueurs :
-            <div v-for="user in activeRoom.users" :key="user._id"><v-icon color="warning" icon="mdi-crown" v-if="user._id === activeRoom.owner && !ingame"></v-icon>{{ user.username }}</div>
-        </v-col>
-    </v-row>
-    <v-row v-if="user.logged._id === activeRoom.owner && !ingame" class="w-75 d-flex">
-        <v-col cols="9">
-            <v-card class="ml-2">
-                <v-card-title class="d-flex bg-blue">Create a quizz</v-card-title>
-                <v-select class="mt-4 pl-5 pr-5" v-model="selected" :items="tags" :item-props="itemProps" item-value="category" label="Select categories" multiple persistent-hint></v-select>
-                <div class="">
-                    <span class="text-subtitle-1 pl-5">Pick difficulties</span>
-                    <v-checkbox :disabled="user.logged._id !== activeRoom.owner" class="d-flex w-50 pl-5" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
-                </div>
-                <v-slider class="w-75 pl-5" label="Secondes par question" :min="5" :max="30" step="5" v-model="selectedTime" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
-                <v-slider class="w-75 pl-5" label="Nombre de questions" :min="3" :max="15" step="2" v-model="selectedQuestions" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
-                <v-card-actions class="d-flex justify-center">
-                    <v-btn class="bg-success mb-5" @click="getQuizz()">Start !</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-col>
-    </v-row>
-    <v-row v-if="user.logged._id !== activeRoom.owner && !ingame">
-        <v-col cols="10">
-            <v-card class="ml-2">
-                <v-card-title class="d-flex bg-blue">Host is setting the quizz...</v-card-title>
-            </v-card>
-        </v-col>
-    </v-row>
-    <v-row v-show="ingame">
-        <v-col cols="12">
-            <Quizz ref="quizzComponent"></Quizz>
-        </v-col>
-    </v-row>
+    <v-container class="bg-grey h-100">
+        <v-row class="w-50 d-flex">
+            <v-col cols="12">
+                Liste des joueurs :
+                <div v-for="user in activeRoom.users" :key="user._id"><v-icon color="warning" icon="mdi-crown" v-if="user._id === activeRoom.owner && !ingame"></v-icon>{{ user.username }}</div>
+            </v-col>
+        </v-row>
+        <v-row v-if="user.logged._id === activeRoom.owner && !ingame" class="w-75 d-flex">
+            <v-col cols="9">
+                <v-card class="ml-2">
+                    <v-card-title class="d-flex bg-blue">Create a quizz</v-card-title>
+                    <v-select class="mt-4 pl-5 pr-5" v-model="selected" :items="tags" :item-props="itemProps" item-value="category" label="Select categories" multiple persistent-hint></v-select>
+                    <div class="">
+                        <span class="text-subtitle-1 pl-5">Pick difficulties</span>
+                        <v-checkbox :disabled="user.logged._id !== activeRoom.owner" class="d-flex w-50 pl-5" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
+                    </div>
+                    <v-slider class="w-75 pl-5" label="Secondes par question" :min="5" :max="30" step="5" v-model="selectedTime" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
+                    <v-slider class="w-75 pl-5" label="Nombre de questions" :min="3" :max="15" step="2" v-model="selectedQuestions" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
+                    <v-card-actions class="d-flex justify-center">
+                        <v-btn class="bg-success mb-5" @click="getQuizz()">Start !</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-col>
+        </v-row>
+        <v-row v-if="user.logged._id !== activeRoom.owner && !ingame">
+            <v-col cols="10">
+                <v-card class="ml-2">
+                    <v-card-title class="d-flex bg-blue">Host is setting the quizz...</v-card-title>
+                </v-card>
+            </v-col>
+        </v-row>
+        <v-row v-show="ingame">
+            <v-col cols="12">
+                <Quizz ref="quizzComponent"></Quizz>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -157,4 +159,8 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss">
+.h-90 {
+    height: 95%;
+}
+</style>

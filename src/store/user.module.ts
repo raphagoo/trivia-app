@@ -5,7 +5,7 @@ import consoleLogger from '../interfaces/consoleLogger'
 import { userState } from '../types'
 import { router } from '../router'
 
-const state: userState = { logged: null }
+const state: userState = { logged: null, register: { message: '', error: false }, login: { message: '', error: false } }
 
 const actions = {
     register({ commit }: { commit: Commit }, user: { name: string; password: string }) {
@@ -15,7 +15,7 @@ const actions = {
                 commit('registerSuccess', response)
             })
             .catch((error) => {
-                commit('registerError', error)
+                commit('registerError', error.response)
             })
     },
     login({ commit }: { commit: Commit }, user: { email: string; password: string }) {
@@ -25,7 +25,7 @@ const actions = {
                 commit('loginSuccess', response)
             })
             .catch((error) => {
-                commit('loginError', error)
+                commit('loginError', error.response)
             })
     },
     createGuestUser({ commit }: { commit: Commit }) {
@@ -54,6 +54,11 @@ const actions = {
 }
 
 const mutations = {
+    resetState(state: userState) {
+        state.logged = null
+        state.register = { message: '', error: false }
+        state.login = { message: '', error: false }
+    },
     registerRequest(state: userState) {
         state.logged = null
     },
@@ -65,7 +70,8 @@ const mutations = {
     },
     registerError(state: userState, error: AxiosResponse) {
         state.logged = null
-        consoleLogger.error(error.data)
+        state.register.error = true
+        state.register.message = error.data
     },
     loginRequest(state: userState) {
         state.logged = null
@@ -76,9 +82,10 @@ const mutations = {
         localStorage.setItem('refreshToken', response.data.refresh)
         router.push({ name: 'home' })
     },
-    loginError(state: userState, error: AxiosResponse) {
+    loginError(state: userState) {
         state.logged = null
-        consoleLogger.error(error.data)
+        state.login.error = true
+        state.login.message = 'Identifiants incorrects'
     },
     createGuestUserRequest(state: userState) {
         state.logged = null

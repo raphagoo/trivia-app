@@ -1,5 +1,5 @@
 <template>
-    <v-row class="h-100 bg-grey" align="center" justify="center">
+    <v-row align="center" justify="center">
         <v-col cols="9">
             <vue-countdown ref="vueCountdown" :auto-start="false" :time="countdown" @end="verifyAnswer()" v-slot="{ seconds }">
                 Time Remaining: {{ seconds }} seconds.
@@ -88,7 +88,7 @@ export default defineComponent({
             this.getQuestion(this.room.active._id).then(() => {
                 this.countdown = this.room.active.time * 1000
                 //Il faut que ca fasse 100 quand on multiplie par les secondes pour avoir un pourcentage
-                this.forProgress = 100
+                this.forProgress = 100 / this.room.active.time
                 this.vueCountdown?.start()
                 this.ingame = true
             })
