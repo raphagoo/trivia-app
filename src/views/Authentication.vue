@@ -7,9 +7,9 @@
                     <v-card-text class="pt-5">
                         <v-alert type="error" v-if="user.login.error" class="text-center mb-3" dense>{{ user.login.message }}</v-alert>
                         <v-form @submit.prevent="sendLogin">
-                            <v-text-field v-model="loginForm.username" label="Username"></v-text-field>
-                            <v-text-field v-model="loginForm.password" label="Password" type="password"></v-text-field>
-                            <v-btn :disabled="!isLoginFormValid" type="submit" color="primary">Login</v-btn>
+                            <v-text-field name="loginUsername" v-model="loginForm.username" label="Username"></v-text-field>
+                            <v-text-field name="loginPassword" v-model="loginForm.password" label="Password" type="password"></v-text-field>
+                            <v-btn :disabled="!isLoginFormValid" name="loginSubmit" type="submit" color="primary">Login</v-btn>
                         </v-form>
                     </v-card-text>
                 </v-card>
@@ -22,13 +22,14 @@
                     <v-card-text class="pt-5">
                         <v-alert type="error" v-if="user.register.error" class="text-center mb-3" dense>{{ user.register.message }}</v-alert>
                         <v-form @submit.prevent="sendRegister">
-                            <v-text-field v-model="registerForm.username" label="Username"></v-text-field>
-                            <v-text-field v-model="registerForm.password" label="Password" type="password"></v-text-field>
+                            <v-text-field name="registerUsername" v-model="registerForm.username" label="Username"></v-text-field>
+                            <v-text-field name="registerPassword" v-model="registerForm.password" label="Password" type="password"></v-text-field>
                             <div class="w-100">
                                 <v-progress-linear class="mb-2" min="0" max="3" v-model="passwordStrength.id" :color="passwordStrengthColors[passwordStrength.id]" height="3"></v-progress-linear>
                                 <span>{{ passwordStrength.value }}</span>
                             </div>
-                            <v-btn :disabled="[0, 1].includes(passwordStrength.id) && !isRegisterFormValid" class="mt-3" type="submit" color="primary">Register</v-btn>
+                            {{ passwordStrength.id }}
+                            <v-btn name="registerSubmit" :disabled="[0, 1].includes(passwordStrength.id) || !isRegisterFormValid" class="mt-3" type="submit" color="primary">Register</v-btn>
                         </v-form>
                     </v-card-text>
                 </v-card>

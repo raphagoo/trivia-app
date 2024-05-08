@@ -22,7 +22,7 @@ export default defineConfig({
             '@': resolve(__dirname, 'src'),
         },
     },
-    base: '/trivia-app/',
+    base: '/',
     /* remove the need to specify .vue files https://vitejs.dev/config/#resolve-extensions
     resolve: {
         extensions: [
