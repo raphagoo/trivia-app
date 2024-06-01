@@ -43,7 +43,7 @@ describe('Room Test', () => {
     })
 
     it('Creates a room', function () {
-        cy.visit('http://localhost:8080/room');
+        cy.visit('http://localhost:8080/');
 
         cy.get('input[name=hostRoomName]').type('newroom');
         cy.get('button[name=hostRoomSubmit]').click();

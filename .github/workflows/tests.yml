@@ -40,6 +40,10 @@ jobs:
         echo "MONGO_TEST_URL=mongodb://localhost:27017/trivia-app-test" >> .env
         npm run fixtures
 
+    - name: Start Api
+      run: |
+        npm start
+
     - name: Checkout current repository
       uses: actions/checkout@v3
 
