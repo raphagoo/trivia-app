@@ -26,11 +26,13 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Build API
-      run: |
-        npm install --force
-        npm run build  # replace with your build command
+    - name: Install dependencies
+      run: npm ci
 
+    - name: Set up test database
+      run: |
+        echo "MONGO_TEST_URL=mongodb://localhost:27017/trivia-app-test" >> .env
+        npm run fixtures
 
     - name: Checkout current repository
       uses: actions/checkout@v3
