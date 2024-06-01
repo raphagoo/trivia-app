@@ -42,7 +42,7 @@ jobs:
 
     - name: Start Api
       run: |
-        npm start
+        nohup npm start &
 
     - name: Checkout current repository
       uses: actions/checkout@v3
