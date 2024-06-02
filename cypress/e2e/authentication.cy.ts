@@ -1,29 +1,10 @@
 
 describe('Authentication Test', () => {
-    beforeEach(function () {
-        cy.fixture('user').as('userData');
-
-        cy.intercept('POST', '/user/login', (req) => {
-            if (req.body.username !== this.userData.username || req.body.password !== this.userData.password) {
-                req.reply({
-                    statusCode: 404,
-                    body: { message: 'Identifiants incorrects' },
-                });
-            } else {
-            req.reply({ fixture: 'user.json' });
-            }
-        }).as('login');
-
-        cy.intercept('POST', '/user/register', (req) => {
-            req.reply({ fixture: 'user.json' });
-        }).as('register');
-    });
-
     it('Logs in to the application', function () {
         cy.visit('http://localhost:8080/authentication');
 
-        cy.get('input[name=loginUsername]').type(this.userData.username);
-        cy.get('input[name=loginPassword]').type(this.userData.password);
+        cy.get('input[name=loginUsername]').type('user 1');
+        cy.get('input[name=loginPassword]').type('password');
 
         cy.get('button[name=loginSubmit]').click();
 
@@ -33,7 +14,7 @@ describe('Authentication Test', () => {
     it('Displays an error with invalid credentials', function () {
         cy.visit('http://localhost:8080/authentication');
 
-        cy.get('input[name=loginUsername]').type(this.userData.username);
+        cy.get('input[name=loginUsername]').type('user 1');
         cy.get('input[name=loginPassword]').type('invalidpassword');
 
         cy.get('button[name=loginSubmit]').click();
