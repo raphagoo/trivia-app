@@ -23,7 +23,7 @@ jobs:
     steps:
 
     - name: Checkout another repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: raphagoo/trivia-app-server
         ref: launch_api_from_front
@@ -48,8 +48,9 @@ jobs:
       run: |
         nohup npm start &
 
-    - name: Checkout current repository
-      uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v4
+
 
     - name: Build
       run: |
