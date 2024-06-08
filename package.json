@@ -30,7 +30,6 @@
         "vuex-persistedstate": "^4.1.0"
     },
     "devDependencies": {
-        "@types/cypress": "^1.1.3",
         "@types/jest": "^29.5.12",
         "@types/node": "^20.12.13",
         "@types/webfontloader": "^1.6.38",

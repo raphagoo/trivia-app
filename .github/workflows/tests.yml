@@ -48,9 +48,6 @@ jobs:
       run: |
         nohup npm start &
 
-    - name: Wait for API to start
-      run: sleep 60  # wait for 60 seconds
-
     - name: Checkout
       uses: actions/checkout@v4
 
@@ -64,6 +61,10 @@ jobs:
     - name: Lint
       run: |
         npm run lint
+
+    - name: Check API
+      run: |
+        curl --fail --silent --head http://localhost:3000 || exit 1
 
     - name: Cypress run
       # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
