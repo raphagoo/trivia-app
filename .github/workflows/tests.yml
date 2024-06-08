@@ -46,7 +46,7 @@ jobs:
 
     - name: Start Api
       run: |
-        nohup npm start > server.log 2>&1 &
+        nohup npm start &
 
     - name: Checkout
       uses: actions/checkout@v4
