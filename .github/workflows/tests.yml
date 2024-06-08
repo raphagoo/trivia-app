@@ -46,7 +46,7 @@ jobs:
 
     - name: Start Api
       run: |
-        nohup npm start &
+        nohup npm start > server.log 2>&1 &
 
     - name: Checkout
       uses: actions/checkout@v4
@@ -81,6 +81,9 @@ jobs:
         parallel: true # Runs test in parallel using settings above
       env:
         CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+
+    - name: Print server logs
+      run: cat server.log
 
     - name: Upload screenshots
       uses: actions/upload-artifact@v2
