@@ -48,9 +48,6 @@ jobs:
       run: |
         nohup npm start &
 
-    - name: Wait for API to start
-      run: sleep 60  # wait for 60 seconds
-
     - name: Checkout
       uses: actions/checkout@v4
 
