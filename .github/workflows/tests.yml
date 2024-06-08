@@ -48,6 +48,9 @@ jobs:
       run: |
         nohup npm start &
 
+    - name: Wait for API to start
+      run: sleep 60  # wait for 60 seconds
+
     - name: Checkout
       uses: actions/checkout@v4
 
@@ -69,7 +72,7 @@ jobs:
         # Starts web server for E2E tests - replace with your own server invocation
         # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server
         start: npm start
-        wait-on: 'http://localhost:8080,http://localhost:3000' # Waits for above
+        wait-on: 'http://localhost:8080' # Waits for above
         # Records to Cypress Cloud
         # https://docs.cypress.io/guides/cloud/projects#Set-up-a-project-to-record
         record: true
