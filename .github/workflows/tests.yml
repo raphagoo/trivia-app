@@ -95,10 +95,16 @@ jobs:
         cd front
         node ./testAxios.js
 
+    - name: Start server
+      run: |
+        cd front
+        npm start &
+      env:
+        CI: true
+
     - name: Cypress run
       uses: cypress-io/github-action@v6
       with:
-        start: cd frontend && npm start
         wait-on: 'http://localhost:8080' # Waits for above
         record: true
         parallel: false # Runs test in parallel using settings above
