@@ -27,6 +27,7 @@ jobs:
       with:
         repository: raphagoo/trivia-app-server
         ref: launch_api_from_front
+        path: api
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
@@ -34,10 +35,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Install dependencies
-      run: npm install --force
+      run: |
+        cd api
+        npm install --force
 
     - name: Set up test database
       run: |
+        cd api
         echo "MONGO_TEST_URL=mongodb://localhost:27017/trivia-app-test" >> .env
         echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET }}" >> .env
         echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}" >> .env
@@ -46,10 +50,12 @@ jobs:
 
     - name: Start Api
       run: |
+        cd api
         nohup npm start &
 
     - name: Test axios API side
       run: |
+        cd api
         npm run test-axios
 
     - name: Checkout
