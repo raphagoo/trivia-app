@@ -12,7 +12,7 @@ describe('Room Test', () => {
     it('Creates a room', function () {
         cy.visit('http://localhost:8080/');
 
-        cy.intercept('GET', '/trivia/tags', {
+        cy.intercept('GET', '/trivia/tags*', {
             statusCode: 200,
             body: [
                 { category: 'Video games', value: 2 },
