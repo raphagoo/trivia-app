@@ -12,7 +12,7 @@
         <v-col cols="7">
             <v-card>
                 <v-card-title class="bg-grey d-flex align-center"><v-icon icon="mdi-account-group"></v-icon><span class="pl-2">Join a room</span></v-card-title>
-                <div v-for="room in rooms" :key="room._id">
+                <div class="rooms" v-for="room in rooms" :key="room._id">
                     <div class="pa-3">
                         {{ room.name }} - {{ room.users.length }} users connected
                         <div v-if="room.inGame">En jeu</div>

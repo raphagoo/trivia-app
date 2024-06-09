@@ -1,56 +1,28 @@
 describe('Room Test', () => {
     beforeEach(function () {
         cy.fixture('user').as('userData');
+    })
 
-        cy.intercept('POST', '/user/guest', (req) => {
-            req.reply({  "user": {
-                    "_id": "id_guest",
-                    "username": "guest-username",
-                    "password": "password",
-                    "__v": 0
-                },
-                "token": "token" });
-        }).as('login');
+    it('List rooms', function () {
+        cy.visit('http://localhost:8080/');
 
-        cy.intercept('POST', '/room', (req) => {
-            req.reply({
-                "name": "newroom",
-                "inGame": false,
-                "users": [],
-                "owner": "id_guest",
-                "_id": "id_room",
-                "__v": 0
-            });
-        }).as('createRoom');
-
-        cy.intercept('POST', '/room/join/id_room', (req) => {
-            req.reply({
-                "_id": "id_room",
-                "name": "newroom",
-                "inGame": false,
-                "users": [
-                    {
-                        "_id": "id_guest",
-                        "username": "guest-77bb74ac4ff29",
-                        "password": "password",
-                        "__v": 0
-                    }
-                ],
-                "owner": "id_guest",
-                "__v": 0
-            });
-        }).as('joinRoom');
+        cy.get('div[class=rooms]').its('length').should('eq', 1);
     })
 
     it('Creates a room', function () {
         cy.visit('http://localhost:8080/');
 
+        cy.intercept('POST', '/room/join/*').as('joinRoom');
+
         cy.get('input[name=hostRoomName]').type('newroom');
         cy.get('button[name=hostRoomSubmit]').click();
 
+        cy.wait('@joinRoom');
+        cy.url().should('include', '/room/');
+
         cy.get('.checkboxDifficulty').its('length').should('eq', 3);
 
-        cy.url().should('eq', 'http://localhost:8080/room/id_room');
+        cy.url().should('match', /http:\/\/localhost:8080\/room\/.+/);
         cy.get('.v-slider-thumb').first() // replace with the selector for your v-slider
         .click() // simulate clicking on the slider
         .trigger('mousedown') // start the dragging
