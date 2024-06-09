@@ -10,28 +10,94 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+        mongodb:
+          image: mongo:latest
+          ports:
+            - 27017:27017
+
     strategy:
       matrix:
         node-version: [20.x]
 
     steps:
-    - uses: actions/checkout@v3
+
+    - name: Checkout another repository
+      uses: actions/checkout@v4
+      with:
+        repository: raphagoo/trivia-app-server
+        ref: master  # change this to the api branch you want to test
+        path: api
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Build
+    - name: Install dependencies
       run: |
+        cd api
+        npm ci
+
+    - name: Set up test database
+      run: |
+        cd api
+        echo "MONGO_TEST_URL=mongodb://localhost:27017/trivia-app-test" >> .env
+        echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET }}" >> .env
+        echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}" >> .env
+        echo "NODE_ENV=test" >> .env
+        npm run fixtures
+
+    - name: Start Api
+      run: |
+        cd api
+        nohup npm start &
+
+    - name: Checkout front
+      uses: actions/checkout@v4
+      with:
+        repository: raphagoo/trivia-app
+        path: front
+
+    - name: Install front
+      run: |
+        cd front
         npm install --force
+
     - name: Prettier
       run: |
+        cd front
         npm run prettier-check
+
     - name: Lint
       run: |
+        cd front
         npm run lint
-    - name: Run
+
+    - name: Wait for server to start
       run: |
+        for i in {1..60}; do
+          if curl --fail --silent --head http://localhost:3000/health; then
+            echo 'Server is ready'
+            break
+          fi
+          echo 'Waiting for server...'
+          sleep 1
+        done
+
+    - name: Cypress run
+      uses: cypress-io/github-action@v6
+      with:
+        working-directory: front
+        start: npm start
+        wait-on: 'http://localhost:8080' # Waits for above
+        record: true
+        parallel: false # Runs test in parallel using settings above
+      env:
+        CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+
+    - name: Build
+      run: |
+        cd front
         npm run build
 

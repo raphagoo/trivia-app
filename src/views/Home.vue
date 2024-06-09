@@ -4,15 +4,15 @@
             <v-card>
                 <v-card-title class="bg-grey d-flex align-center"><v-icon icon="mdi-crown"></v-icon><span class="pl-2">Host a room</span></v-card-title>
                 <v-form @submit.prevent="pushRoom()">
-                    <v-text-field class="pa-4" v-model="roomName" label="Room Name"></v-text-field>
-                    <v-btn type="submit" block class="mt-1 bg-green w-75">Create</v-btn>
+                    <v-text-field name="hostRoomName" class="pa-4" v-model="roomName" label="Room Name"></v-text-field>
+                    <v-btn name="hostRoomSubmit" type="submit" block class="mt-1 bg-green w-75">Create</v-btn>
                 </v-form>
             </v-card>
         </v-col>
         <v-col cols="7">
             <v-card>
                 <v-card-title class="bg-grey d-flex align-center"><v-icon icon="mdi-account-group"></v-icon><span class="pl-2">Join a room</span></v-card-title>
-                <div v-for="room in rooms" :key="room._id">
+                <div class="rooms" v-for="room in rooms" :key="room._id">
                     <div class="pa-3">
                         {{ room.name }} - {{ room.users.length }} users connected
                         <div v-if="room.inGame">En jeu</div>

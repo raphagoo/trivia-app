@@ -13,12 +13,12 @@
                     <v-select class="mt-4 pl-5 pr-5" v-model="selected" :items="tags" :item-props="itemProps" item-value="category" label="Select categories" multiple persistent-hint></v-select>
                     <div class="">
                         <span class="text-subtitle-1 pl-5">Pick difficulties</span>
-                        <v-checkbox :disabled="user.logged._id !== activeRoom.owner" class="d-flex w-50 pl-5" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
+                        <v-checkbox :disabled="user.logged._id !== activeRoom.owner" class="d-flex w-50 pl-5 checkboxDifficulty" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
                     </div>
-                    <v-slider class="w-75 pl-5" label="Secondes par question" :min="5" :max="30" step="5" v-model="selectedTime" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
-                    <v-slider class="w-75 pl-5" label="Nombre de questions" :min="3" :max="15" step="2" v-model="selectedQuestions" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
+                    <v-slider id="sliderSeconds" class="w-75 pl-5" label="Secondes par question" :min="5" :max="30" step="5" v-model="selectedTime" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
+                    <v-slider id="sliderNumber" class="w-75 pl-5" label="Nombre de questions" :min="3" :max="15" step="2" v-model="selectedQuestions" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
                     <v-card-actions class="d-flex justify-center">
-                        <v-btn class="bg-success mb-5" @click="getQuizz()">Start !</v-btn>
+                        <v-btn name="startQuizzBtn" class="bg-success mb-5" @click="getQuizz()">Start !</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-col>

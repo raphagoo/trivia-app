@@ -7,11 +7,12 @@
         "build": "vite build",
         "start": "vite",
         "preview": "vite preview",
-        "test": "jest ./src/tests",
         "prettier-check": "prettier ./src -c --no-semi --single-quote",
         "prettier-write": "prettier ./src -w --no-semi --single-quote",
         "prettier": "prettier",
-        "lint": "eslint --max-warnings=0 --fix-dry-run --ext .ts,.vue ."
+        "lint": "eslint --max-warnings=0 --fix-dry-run --ext .ts,.vue .",
+        "test": "cypress run",
+        "test-interactive": "cypress open"
     },
     "dependencies": {
         "@chenfengyuan/vue-countdown": "^2.1.2",
@@ -38,6 +39,7 @@
         "@vitejs/plugin-vue": "^5.0.4",
         "@vue/test-utils": "^2.4.6",
         "@vue/vue3-jest": "^29.2.6",
+        "cypress": "^13.10.0",
         "eslint": "^8.57.0",
         "eslint-plugin-vue": "^9.26.0",
         "jest": "^29.7.0",
