@@ -96,14 +96,8 @@ jobs:
       env:
         CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
-    - name: Upload screenshots
-      uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: cypress-screenshots
-        path: cypress/screenshots/
-
     - name: Build
       run: |
+        cd front
         npm run build
 
