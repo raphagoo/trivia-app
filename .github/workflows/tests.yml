@@ -64,7 +64,7 @@ jobs:
     - name: Wait for server to start
       run: |
         for i in {1..60}; do
-          if curl --fail --silent --head http://localhost:3000/room; then
+          if curl --fail --silent --head http://localhost:3000/health; then
             echo 'Server is ready'
             break
           fi
@@ -78,7 +78,7 @@ jobs:
         start: npm start
         wait-on: 'http://localhost:8080' # Waits for above
         record: true
-        parallel: true # Runs test in parallel using settings above
+        parallel: false # Runs test in parallel using settings above
       env:
         CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
