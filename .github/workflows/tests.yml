@@ -60,15 +60,23 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        repository: raphagoo/trivia-app
+        path: front
 
     - name: Build
       run: |
+        cd front
         npm install --force
+
     - name: Prettier
       run: |
+        cd front
         npm run prettier-check
+
     - name: Lint
       run: |
+        cd front
         npm run lint
 
     - name: Wait for server to start
@@ -84,6 +92,7 @@ jobs:
 
     - name: Test axios front side
       run: |
+        cd front
         node ./testAxios.js
 
     - name: Cypress run
