@@ -12,6 +12,15 @@ describe('Room Test', () => {
     it('Creates a room', function () {
         cy.visit('http://localhost:8080/');
 
+        cy.intercept('GET', '/trivia/tags', {
+            statusCode: 200,
+            body: [
+                { category: 'Video games', value: 2 },
+                { category: 'Science: Computers', value: 18 },
+                { category: 'Science: Gadgets', value: 30 },
+            ],
+        }).as('getTags');
+
         cy.intercept('POST', '/room/join/*').as('joinRoom');
 
         cy.get('input[name=hostRoomName]').type('newroom');

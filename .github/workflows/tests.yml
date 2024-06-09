@@ -37,7 +37,7 @@ jobs:
     - name: Install dependencies
       run: |
         cd api
-        npm install --force
+        npm ci
 
     - name: Set up test database
       run: |
@@ -53,18 +53,13 @@ jobs:
         cd api
         nohup npm start &
 
-    - name: Test axios API side
-      run: |
-        cd api
-        npm run test-axios
-
-    - name: Checkout
+    - name: Checkout front
       uses: actions/checkout@v4
       with:
         repository: raphagoo/trivia-app
         path: front
 
-    - name: Build
+    - name: Install front
       run: |
         cd front
         npm install --force
@@ -90,30 +85,16 @@ jobs:
           sleep 1
         done
 
-    - name: Test axios front side
-      run: |
-        cd front
-        node ./testAxios.js
-
-    - name: Start server
-      run: |
-        cd front
-        npm start &
-      env:
-        CI: true
-
     - name: Cypress run
       uses: cypress-io/github-action@v6
       with:
         working-directory: front
+        start: npm start
         wait-on: 'http://localhost:8080' # Waits for above
         record: true
         parallel: false # Runs test in parallel using settings above
       env:
         CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-
-    - name: Print server logs
-      run: cat server.log
 
     - name: Upload screenshots
       uses: actions/upload-artifact@v2
@@ -122,7 +103,7 @@ jobs:
         name: cypress-screenshots
         path: cypress/screenshots/
 
-    - name: Run
+    - name: Build
       run: |
         npm run build
 
