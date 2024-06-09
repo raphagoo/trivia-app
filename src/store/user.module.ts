@@ -22,11 +22,9 @@ const actions = {
         commit('loginRequest')
         api.post('/user/login', user, { headers: { Accept: 'application/json' } })
             .then((response) => {
-                console.log(response)
                 commit('loginSuccess', response)
             })
             .catch((error) => {
-                console.log(error)
                 commit('loginError', error.response)
             })
     },
