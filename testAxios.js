@@ -9,5 +9,5 @@ axios({
   console.log(response.data);
 })
 .catch(error => {
-  console.error('Request failed:', error.data);
+  console.error('Request failed:', error.response.data);
 });
