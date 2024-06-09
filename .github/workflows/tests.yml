@@ -48,6 +48,10 @@ jobs:
       run: |
         nohup npm start &
 
+    - name: Test axios
+      run: |
+        npm run test-axios
+
     - name: Checkout
       uses: actions/checkout@v4
 
@@ -71,10 +75,6 @@ jobs:
           echo 'Waiting for server...'
           sleep 1
         done
-
-    - name: Test axios
-      run: |
-        npm run test-axios
 
     - name: Cypress run
       uses: cypress-io/github-action@v6
