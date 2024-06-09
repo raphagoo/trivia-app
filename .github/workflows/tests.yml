@@ -48,7 +48,7 @@ jobs:
       run: |
         nohup npm start &
 
-    - name: Test axios
+    - name: Test axios API side
       run: |
         npm run test-axios
 
@@ -75,6 +75,10 @@ jobs:
           echo 'Waiting for server...'
           sleep 1
         done
+
+    - name: Test axios front side
+      run: |
+        node ./testAxios.js
 
     - name: Cypress run
       uses: cypress-io/github-action@v6
