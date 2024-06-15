@@ -73,7 +73,6 @@ describe('Room Test', () => {
                 "__v": 1
             },
         }).as('getQuestion');
-        cy.wait('@getQuestion');
 
         cy.get('div[class=users-in-room]').its('length').should('eq', 1);
 
