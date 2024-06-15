@@ -92,7 +92,7 @@ jobs:
         start: npm start
         wait-on: 'http://localhost:8080' # Waits for above
         record: true
-        parallel: false # Runs test in parallel using settings above
+        parallel: true # Runs test in parallel using settings above
       env:
         CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 

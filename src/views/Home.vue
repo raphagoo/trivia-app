@@ -16,7 +16,7 @@
                     <div class="pa-3">
                         {{ room.name }} - {{ room.users.length }} users connected
                         <div v-if="room.inGame">En jeu</div>
-                        <v-btn class="bg-green" v-if="!room.inGame" @click="toRoom(room._id)">Join</v-btn>
+                        <v-btn class="bg-green button-join-room" v-if="!room.inGame" @click="toRoom(room._id)">Join</v-btn>
                     </div>
                     <v-divider></v-divider>
                 </div>
@@ -112,11 +112,8 @@ export default {
             createGuestUser: 'createGuestUser',
         }),
         toRoom(roomId: string) {
-            if (localStorage.getItem('token') === null) {
-                this.createGuestUser()
-                    .then(() => {
-                        this.joinRoom(roomId)
-                    })
+            const joinRoomAndNavigate = () => {
+                this.joinRoom(roomId)
                     .then(() => {
                         socket.emit('join_room', {
                             room: roomId,
@@ -124,14 +121,21 @@ export default {
                         })
                         this.$router.push('/room/' + roomId)
                     })
-            } else {
-                this.joinRoom(roomId).then(() => {
-                    socket.emit('join_room', {
-                        room: roomId,
-                        user: this.user.logged,
+                    .catch((error) => {
+                        console.error('Error joining room:', error)
+                        // Handle the error appropriately
                     })
-                    this.$router.push('/room/' + roomId)
-                })
+            }
+
+            if (localStorage.getItem('token') === null) {
+                this.createGuestUser()
+                    .then(joinRoomAndNavigate)
+                    .catch((error) => {
+                        console.error('Error creating guest user:', error)
+                        // Handle the error appropriately
+                    })
+            } else {
+                joinRoomAndNavigate()
             }
         },
     },
