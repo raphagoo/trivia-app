@@ -45,7 +45,34 @@ describe('Room Test', () => {
 
         cy.get('button[name=startQuizzBtn]').should('exist').click();
 
-        cy.intercept('GET', '/question/*').as('getQuestion');
+        cy.intercept('GET', '/question/*', {
+            statusCode: 200,
+            body: {
+                "_id": "666dac2f36bf8fb514d32c12",
+                "question": "What type of pastry is used for profiteroles?",
+                "category": "food_and_drink",
+                "difficulty": "hard",
+                "answers": [
+                    {
+                        "_id": "666dac2f36bf8fb514d32c21",
+                        "answer": "Choux "
+                    },
+                    {
+                        "_id": "666dac2f36bf8fb514d32c1f",
+                        "answer": "Shortcrust"
+                    },
+                    {
+                        "_id": "666dac2f36bf8fb514d32c20",
+                        "answer": "Puff"
+                    },
+                    {
+                        "_id": "666dac2f36bf8fb514d32c1e",
+                        "answer": "Filo"
+                    }
+                ],
+                "__v": 1
+            },
+        }).as('getQuestion');
         cy.wait('@getQuestion');
 
         cy.get('div[class=users-in-room]').its('length').should('eq', 1);
