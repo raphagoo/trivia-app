@@ -161,7 +161,7 @@ const mutations = {
         state.active = response.data
     },
     joinRoomError(state: roomState, error: AxiosResponse) {
-        consoleLogger.error(error.data)
+        consoleLogger.error(error)
         state.joining = false
     },
     getAllRoomsRequest(state: roomState) {
