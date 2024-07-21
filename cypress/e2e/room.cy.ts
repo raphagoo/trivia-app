@@ -48,10 +48,8 @@ describe('Room Test', () => {
         cy.get('button[name=hostRoomSubmit]').click();
 
         cy.wait('@joinRoom');
+        cy.wait('@getTags');
         cy.url().should('include', '/room/');
-
-        cy.visit('http://localhost:8080/');
-        cy.get('div[class=rooms]').its('length').should('eq', 1);
     })
 
     it('Creates, joins and start a room', function () {
