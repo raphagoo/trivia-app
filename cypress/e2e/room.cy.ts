@@ -30,6 +30,30 @@ describe('Room Test', () => {
         cy.get('div[class=users-in-room]').its('length').should('eq', 2);
     })
 
+    it('Creates and leaves a room', function () {
+        cy.visit('http://localhost:8080/');
+
+        cy.intercept('GET', '/trivia/tags*', {
+            statusCode: 200,
+            body: [
+                { category: 'Video games', value: 2 },
+                { category: 'Science: Computers', value: 18 },
+                { category: 'Science: Gadgets', value: 30 },
+            ],
+        }).as('getTags');
+
+        cy.intercept('POST', '/room/join/*').as('joinRoom');
+
+        cy.get('input[name=hostRoomName]').type('newroom2');
+        cy.get('button[name=hostRoomSubmit]').click();
+
+        cy.wait('@joinRoom');
+        cy.url().should('include', '/room/');
+
+        cy.visit('http://localhost:8080/');
+        cy.get('div[class=rooms]').its('length').should('eq', 1);
+    })
+
     it('Creates, joins and start a room', function () {
         cy.visit('http://localhost:8080/');
 
@@ -98,29 +122,5 @@ describe('Room Test', () => {
         cy.get('div[class=users-in-room]').its('length').should('eq', 1);
 
         cy.get('#vue-countdown').should('exist');
-    })
-
-    it('Creates and leaves a room', function () {
-        cy.visit('http://localhost:8080/');
-
-        cy.intercept('GET', '/trivia/tags*', {
-            statusCode: 200,
-            body: [
-                { category: 'Video games', value: 2 },
-                { category: 'Science: Computers', value: 18 },
-                { category: 'Science: Gadgets', value: 30 },
-            ],
-        }).as('getTags');
-
-        cy.intercept('POST', '/room/join/*').as('joinRoom');
-
-        cy.get('input[name=hostRoomName]').type('newroom2');
-        cy.get('button[name=hostRoomSubmit]').click();
-
-        cy.wait('@joinRoom');
-        cy.url().should('include', '/room/');
-
-        cy.visit('http://localhost:8080/');
-        cy.get('div[class=rooms]').its('length').should('eq', 1);
     })
 });
