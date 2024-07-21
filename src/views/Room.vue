@@ -3,7 +3,7 @@
         <v-row class="w-50 d-flex">
             <v-col cols="12">
                 Liste des joueurs :
-                <div v-for="user in activeRoom.users" :key="user._id"><v-icon color="warning" icon="mdi-crown" v-if="user._id === activeRoom.owner && !ingame"></v-icon>{{ user.username }}</div>
+                <div class="users-in-room" v-for="user in activeRoom.users" :key="user._id"><v-icon color="warning" icon="mdi-crown" v-if="user._id === activeRoom.owner"></v-icon>{{ user.username }}</div>
             </v-col>
         </v-row>
         <v-row v-if="user.logged._id === activeRoom.owner && !ingame" class="w-75 d-flex">
@@ -40,8 +40,8 @@
 
 <script lang="ts">
 import { ref, onMounted } from 'vue'
-import { mapActions, mapState, useStore } from 'vuex'
-import { onBeforeRouteLeave, useRoute } from 'vue-router'
+import { mapActions, mapState } from 'vuex'
+import { useRoute } from 'vue-router'
 import { socket } from '../socket'
 import Quizz from '../components/Quizz.vue'
 import { Tag, Room } from '../types/index'
@@ -52,11 +52,6 @@ export default {
         Quizz,
     },
     setup() {
-        onBeforeRouteLeave((to, from, next) => {
-            const store = useStore()
-            socket.emit('leave_room', { room: store.state.room.active._id, user: store.state.user.logged })
-            next()
-        })
         //code obligatoire pour init des child components
         const quizzComponent = ref<InstanceType<typeof Quizz>>() // Assign dom object reference to "myinput" variable
         onMounted(() => {
@@ -104,6 +99,9 @@ export default {
 
             return result
         },
+        leaveRoom() {
+            socket.emit('leave_room', { room: this.room.active._id, user: this.user.logged })
+        },
     },
     computed: {
         ...mapState(['tag', 'user', 'room']),
@@ -111,10 +109,13 @@ export default {
             return this.tag.all || []
         },
         activeRoom() {
+            console.log('activeRoom')
+            console.log(this.room)
             return this.room.all.find((room: Room) => room._id === this.room.active._id)
         },
     },
     mounted() {
+        window.addEventListener('beforeunload', this.leaveRoom)
         const route = useRoute()
         this.roomId = route.params.roomId as string
         socket.on('leave_room', (payload: Object) => {
@@ -141,11 +142,13 @@ export default {
         this.getAllTags()
     },
     beforeUnmount() {
+        this.leaveRoom()
         socket.off('join_room')
         socket.off('generate_quizz')
         socket.off('started_game')
         socket.off('end_game')
         socket.off('leave_room')
+        window.removeEventListener('beforeunload', this.leaveRoom)
     },
     data: () => ({
         selected: [],

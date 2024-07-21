@@ -1,12 +1,12 @@
 <template>
     <v-row align="center" justify="center">
         <v-col cols="9">
-            <vue-countdown ref="vueCountdown" :auto-start="false" :time="countdown" @end="verifyAnswer()" v-slot="{ seconds }">
+            <vue-countdown id="vue-countdown" ref="vueCountdown" :auto-start="false" :time="countdown" @end="verifyAnswer()" v-slot="{ seconds }">
                 Time Remaining: {{ seconds }} seconds.
                 <v-progress-linear :model-value="seconds * forProgress"></v-progress-linear>
             </vue-countdown>
             <v-card v-if="ingame" class="elevation-3">
-                <v-card-title>Question - {{ beautify(room.quizz.current.category) }}</v-card-title>
+                <v-card-title id="question-title">Question - {{ beautify(room.quizz.current.category) }}</v-card-title>
                 <v-card-subtitle :class="room.quizz.current.difficultyColorClass"
                     >{{ beautify(room.quizz.current.difficulty) }}
                     -
