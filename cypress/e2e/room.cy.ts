@@ -50,6 +50,9 @@ describe('Room Test', () => {
         cy.wait('@joinRoom');
         cy.wait('@getTags');
         cy.url().should('include', '/room/');
+
+        cy.go('back');
+        cy.get('div[class=rooms]').its('length').should('eq', 1);
     })
 
     it('Creates, joins and start a room', function () {
