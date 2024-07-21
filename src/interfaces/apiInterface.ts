@@ -25,30 +25,34 @@ api.interceptors.response.use(
     },
     function (error) {
         const originalRequest = error.config
-        if (401 === error.response.status && !originalRequest._retry) {
-            originalRequest._retry = true
-            return api
-                .post('/user/refresh', {}, { headers: { Accept: 'application/json' } })
-                .then((res) => {
-                    if (res.status === 200) {
-                        localStorage.setItem('token', res.data.token)
-                        return api(originalRequest)
-                    }
-                })
-                .catch((err) => {
-                    Swal.fire({
-                        title: 'Session Expired',
-                        icon: 'error',
+        if(error.response) {
+            if (401 === error.response.status && !originalRequest._retry) {
+                originalRequest._retry = true
+                return api
+                    .post('/user/refresh', {}, { headers: { Accept: 'application/json' } })
+                    .then((res) => {
+                        if (res.status === 200) {
+                            localStorage.setItem('token', res.data.token)
+                            return api(originalRequest)
+                        }
                     })
-                    localStorage.clear()
-                    window.location.href = '/'
-                    return Promise.reject(err)
+                    .catch((err) => {
+                        Swal.fire({
+                            title: 'Session Expired',
+                            icon: 'error',
+                        })
+                        localStorage.clear()
+                        window.location.href = '/'
+                        return Promise.reject(err)
+                    })
+            } else if (403 === error.response.status) {
+                Swal.fire({
+                    title: 'Forbidden',
+                    icon: 'error',
                 })
-        } else if (403 === error.response.status) {
-            Swal.fire({
-                title: 'Forbidden',
-                icon: 'error',
-            })
+            } else {
+                return Promise.reject(error)
+            }
         } else {
             return Promise.reject(error)
         }
