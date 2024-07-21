@@ -114,7 +114,7 @@ describe('Room Test', () => {
 
         cy.intercept('POST', '/room/join/*').as('joinRoom');
 
-        cy.get('input[name=hostRoomName]').type('newroom');
+        cy.get('input[name=hostRoomName]').type('newroom2');
         cy.get('button[name=hostRoomSubmit]').click();
 
         cy.wait('@joinRoom');
