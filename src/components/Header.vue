@@ -2,9 +2,7 @@
     <v-app-bar flat density="compact" class="header-bar pa-2" height="64">
         <router-link to="/" style="text-decoration: none; color: inherit" class="d-flex align-center">
             <v-icon icon="mdi-lightning-bolt" color="primary" size="32" class="mr-2"></v-icon>
-            <span class="text-h5 font-weight-bold">
-                Trivia<span class="text-primary">Quest</span>
-            </span>
+            <span class="text-h5 font-weight-bold"> Trivia<span class="text-primary">Quest</span> </span>
         </router-link>
 
         <v-spacer></v-spacer>
@@ -19,9 +17,7 @@
             </v-btn>
         </div>
         <div v-else>
-            <v-btn variant="tonal" color="primary" prepend-icon="mdi-account" to="/authentication" size="small">
-                Login / Register
-            </v-btn>
+            <v-btn variant="tonal" color="primary" prepend-icon="mdi-account" to="/authentication" size="small"> Login / Register </v-btn>
         </div>
     </v-app-bar>
 </template>

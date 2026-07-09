@@ -38,7 +38,7 @@ export default defineComponent({
 
 <style>
 .app-background {
-    background: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 50%, #16213E 100%);
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
     min-height: 100vh;
 }
 
@@ -52,13 +52,13 @@ html {
     width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #1A1A2E;
+    background: #1a1a2e;
 }
 ::-webkit-scrollbar-thumb {
-    background: #6C63FF;
+    background: #6c63ff;
     border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #5A52E0;
+    background: #5a52e0;
 }
 </style>

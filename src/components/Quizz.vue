@@ -2,14 +2,7 @@
     <v-row justify="center">
         <v-col cols="12" lg="9">
             <!-- Hidden countdown for question timer (only rendered when game is active) -->
-            <vue-countdown
-                v-if="ingame && countdownMs > 0"
-                ref="vueCountdown"
-                :auto-start="false"
-                :time="countdownMs"
-                @end="onTimeUp"
-                style="display: none"
-            ></vue-countdown>
+            <vue-countdown v-if="ingame && countdownMs > 0" ref="vueCountdown" :auto-start="false" :time="countdownMs" @end="onTimeUp" style="display: none"></vue-countdown>
 
             <!-- Timer bar -->
             <v-card class="mb-4 pa-2" variant="flat" color="transparent">
@@ -17,23 +10,12 @@
                     <v-icon icon="mdi-timer-sand" :color="timerColor" class="mr-2"></v-icon>
                     <span class="text-h5 font-weight-bold" :style="{ color: timerColor }">{{ timerDisplay }}</span>
                 </div>
-                <v-progress-linear
-                    :model-value="timerProgress"
-                    :color="timerColor"
-                    height="8"
-                    rounded
-                    class="smooth-progress"
-                ></v-progress-linear>
+                <v-progress-linear :model-value="timerProgress" :color="timerColor" height="8" rounded class="smooth-progress"></v-progress-linear>
             </v-card>
 
             <!-- Between-questions countdown overlay -->
             <v-fade-transition>
-                <v-card
-                    v-if="showingNextCountdown"
-                    class="pa-6 mb-4 text-center"
-                    variant="outlined"
-                    color="primary"
-                >
+                <v-card v-if="showingNextCountdown" class="pa-6 mb-4 text-center" variant="outlined" color="primary">
                     <div class="text-h5 font-weight-bold mb-2">Next question in...</div>
                     <div class="text-h1 font-weight-black text-primary">{{ nextCountdown }}</div>
                 </v-card>
@@ -42,11 +24,7 @@
             <!-- Scoreboard -->
             <v-row class="mb-4">
                 <v-col v-for="player in room.active?.users || []" :key="player._id" cols="6" sm="4" md="3" lg="2">
-                    <v-card
-                        variant="outlined"
-                        class="pa-2 text-center score-card"
-                        :class="{ 'current-player': player._id === user.logged?._id }"
-                    >
+                    <v-card variant="outlined" class="pa-2 text-center score-card" :class="{ 'current-player': player._id === user.logged?._id }">
                         <v-avatar :color="player._id === room.active?.owner ? 'warning' : 'primary'" size="28" class="mb-1">
                             <span class="text-caption font-weight-bold white--text">{{ player.username?.charAt(0)?.toUpperCase() }}</span>
                         </v-avatar>
@@ -68,9 +46,7 @@
                         {{ beautify(room.quizz.current.category) }}
                     </v-chip>
                     <v-spacer></v-spacer>
-                    <v-chip variant="flat" color="accent" size="small">
-                        {{ room.quizz.current.points }} pts
-                    </v-chip>
+                    <v-chip variant="flat" color="accent" size="small"> {{ room.quizz.current.points }} pts </v-chip>
                 </div>
 
                 <v-card-title class="text-h5 font-weight-bold pa-0 mb-6 question-text">
@@ -79,12 +55,7 @@
 
                 <v-card-text class="pa-0">
                     <v-row>
-                        <v-col
-                            v-for="answer in room.quizz.current.answers"
-                            :key="answer._id"
-                            cols="12"
-                            md="6"
-                        >
+                        <v-col v-for="answer in room.quizz.current.answers" :key="answer._id" cols="12" md="6">
                             <v-card
                                 :id="answer._id"
                                 class="answer-card"
@@ -98,11 +69,7 @@
                                 :disabled="showResult"
                             >
                                 <div class="d-flex align-center pa-4">
-                                    <v-avatar
-                                        size="32"
-                                        :color="selectedAnswer?._id === answer._id ? 'primary' : 'surface-variant'"
-                                        class="mr-3"
-                                    >
+                                    <v-avatar size="32" :color="selectedAnswer?._id === answer._id ? 'primary' : 'surface-variant'" class="mr-3">
                                         <span class="text-body-2 font-weight-bold">{{ getAnswerLetter(answer._id) }}</span>
                                     </v-avatar>
                                     <span class="text-body-1 font-weight-medium">{{ answer.answer }}</span>
@@ -142,43 +109,21 @@
                                     <v-icon v-else-if="index === 2" color="#CD7F32" icon="mdi-trophy" size="20"></v-icon>
                                     <span v-else class="text-h6 font-weight-bold text-grey">{{ index + 1 }}</span>
                                 </div>
-                                <v-avatar
-                                    :color="player._id === room.active?.owner ? 'warning' : 'primary'"
-                                    size="40"
-                                    class="mr-3"
-                                >
+                                <v-avatar :color="player._id === room.active?.owner ? 'warning' : 'primary'" size="40" class="mr-3">
                                     <span class="text-body-1 font-weight-bold white--text">{{ player.username?.charAt(0)?.toUpperCase() }}</span>
                                 </v-avatar>
                                 <div class="flex-grow-1">
                                     <div class="text-subtitle-1 font-weight-medium">
                                         {{ player.username }}
-                                        <v-chip
-                                            v-if="player._id === room.active?.owner"
-                                            color="warning"
-                                            size="x-small"
-                                            variant="flat"
-                                            class="ml-2"
-                                        >
-                                            Host
-                                        </v-chip>
+                                        <v-chip v-if="player._id === room.active?.owner" color="warning" size="x-small" variant="flat" class="ml-2"> Host </v-chip>
                                     </div>
                                 </div>
-                                <div class="text-h5 font-weight-bold" :class="'rank-score-' + (index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'normal')">
-                                    {{ player.userScore || 0 }} <span class="text-caption font-weight-regular">pts</span>
-                                </div>
+                                <div class="text-h5 font-weight-bold" :class="'rank-score-' + (index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'normal')">{{ player.userScore || 0 }} <span class="text-caption font-weight-regular">pts</span></div>
                             </div>
                         </v-slide-y-transition>
                     </v-card-text>
                     <v-card-actions class="justify-center pt-6">
-                        <v-btn
-                            color="primary"
-                            size="large"
-                            variant="elevated"
-                            prepend-icon="mdi-home"
-                            @click="goHome"
-                        >
-                            Back to Rooms
-                        </v-btn>
+                        <v-btn color="primary" size="large" variant="elevated" prepend-icon="mdi-home" @click="goHome"> Back to Rooms </v-btn>
                     </v-card-actions>
                 </v-card>
             </v-fade-transition>
@@ -234,7 +179,7 @@ export default defineComponent({
         return { vueCountdown }
     },
     mounted() {
-        socket.on('checked_answer', (payload: payloadAnswer) => {
+        ;(socket.on('checked_answer', (payload: payloadAnswer) => {
             this.checkedAnswer(payload)
             const foundUser = this.room.active.users.find((user: User) => user._id === this.user.logged._id)
             if (payload.userId === foundUser._id) {
@@ -270,7 +215,7 @@ export default defineComponent({
                         this.vueCountdown?.start()
                     })
                 }
-            })
+            }))
     },
     beforeUnmount() {
         socket.off('checked_answer')
@@ -398,29 +343,29 @@ export default defineComponent({
     box-shadow: 0 4px 15px rgba(108, 99, 255, 0.15);
 }
 .answer-selected {
-    border-color: #6C63FF !important;
+    border-color: #6c63ff !important;
     background: rgba(108, 99, 255, 0.1) !important;
 }
 .answer-correct {
-    border-color: #00D9A6 !important;
+    border-color: #00d9a6 !important;
     background: rgba(0, 217, 166, 0.15) !important;
 }
 .answer-correct .v-avatar {
-    background: #00D9A6 !important;
+    background: #00d9a6 !important;
 }
 .answer-wrong {
-    border-color: #FF4757 !important;
+    border-color: #ff4757 !important;
     background: rgba(255, 71, 87, 0.15) !important;
 }
 .answer-wrong .v-avatar {
-    background: #FF4757 !important;
+    background: #ff4757 !important;
 }
 
 .score-card {
     border-color: rgba(255, 255, 255, 0.08) !important;
 }
 .current-player {
-    border-color: #6C63FF !important;
+    border-color: #6c63ff !important;
     background: rgba(108, 99, 255, 0.08) !important;
 }
 
@@ -466,13 +411,13 @@ export default defineComponent({
 }
 
 .rank-score-gold {
-    color: #FFD700;
+    color: #ffd700;
 }
 .rank-score-silver {
-    color: #C0C0C0;
+    color: #c0c0c0;
 }
 .rank-score-bronze {
-    color: #CD7F32;
+    color: #cd7f32;
 }
 .rank-score-normal {
     color: rgba(255, 255, 255, 0.7);

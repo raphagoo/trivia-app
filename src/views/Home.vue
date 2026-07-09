@@ -10,25 +10,8 @@
                 </template>
                 <v-card-text>
                     <v-form @submit.prevent="pushRoom()">
-                        <v-text-field
-                            name="hostRoomName"
-                            v-model="roomName"
-                            label="Room Name"
-                            placeholder="Enter a fun room name..."
-                            clearable
-                            :rules="[v => !!v || 'Room name is required']"
-                        ></v-text-field>
-                        <v-btn
-                            name="hostRoomSubmit"
-                            type="submit"
-                            block
-                            color="primary"
-                            size="large"
-                            :disabled="!roomName"
-                            prepend-icon="mdi-plus-circle"
-                        >
-                            Create Room
-                        </v-btn>
+                        <v-text-field name="hostRoomName" v-model="roomName" label="Room Name" placeholder="Enter a fun room name..." clearable :rules="[(v) => !!v || 'Room name is required']"></v-text-field>
+                        <v-btn name="hostRoomSubmit" type="submit" block color="primary" size="large" :disabled="!roomName" prepend-icon="mdi-plus-circle"> Create Room </v-btn>
                     </v-form>
                 </v-card-text>
             </v-card>
@@ -40,9 +23,7 @@
                     <div class="d-flex align-center">
                         <v-icon icon="mdi-account-group" color="primary" class="mr-2"></v-icon>
                         <span class="text-h6 font-weight-bold">Available Rooms</span>
-                        <v-chip variant="flat" color="surface-variant" size="small" class="ml-3">
-                            {{ rooms.length }} room{{ rooms.length !== 1 ? 's' : '' }}
-                        </v-chip>
+                        <v-chip variant="flat" color="surface-variant" size="small" class="ml-3"> {{ rooms.length }} room{{ rooms.length !== 1 ? 's' : '' }} </v-chip>
                     </div>
                 </template>
                 <v-card-text>
@@ -53,13 +34,7 @@
                     </div>
                     <div v-else>
                         <v-slide-y-transition group>
-                            <v-card
-                                v-for="room in rooms"
-                                :key="room._id"
-                                variant="outlined"
-                                class="room-card mb-3"
-                                :class="{ 'room-inactive': room.inGame }"
-                            >
+                            <v-card v-for="room in rooms" :key="room._id" variant="outlined" class="room-card mb-3" :class="{ 'room-inactive': room.inGame }">
                                 <div class="d-flex align-center pa-4">
                                     <v-avatar :color="room.inGame ? 'grey' : 'primary'" size="40" class="mr-4">
                                         <v-icon icon="mdi-gamepad-variant" color="white"></v-icon>
@@ -69,29 +44,11 @@
                                         <div class="d-flex align-center mt-1">
                                             <v-icon icon="mdi-account" size="small" color="grey" class="mr-1"></v-icon>
                                             <span class="text-caption text-grey">{{ room.users.length }} player{{ room.users.length !== 1 ? 's' : '' }} connected</span>
-                                            <v-chip v-if="room.inGame" color="warning" size="x-small" class="ml-3" variant="flat">
-                                                In Game
-                                            </v-chip>
+                                            <v-chip v-if="room.inGame" color="warning" size="x-small" class="ml-3" variant="flat"> In Game </v-chip>
                                         </div>
                                     </div>
-                                    <v-btn
-                                        v-if="!room.inGame"
-                                        class="button-join-room"
-                                        color="success"
-                                        variant="elevated"
-                                        @click="toRoom(room._id)"
-                                        prepend-icon="mdi-login"
-                                    >
-                                        Join
-                                    </v-btn>
-                                    <v-btn
-                                        v-else
-                                        disabled
-                                        variant="text"
-                                        color="grey"
-                                    >
-                                        Spectate
-                                    </v-btn>
+                                    <v-btn v-if="!room.inGame" class="button-join-room" color="success" variant="elevated" @click="toRoom(room._id)" prepend-icon="mdi-login"> Join </v-btn>
+                                    <v-btn v-else disabled variant="text" color="grey"> Spectate </v-btn>
                                 </div>
                             </v-card>
                         </v-slide-y-transition>

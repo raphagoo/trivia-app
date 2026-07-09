@@ -16,29 +16,12 @@
                         </template>
                         <v-card-text>
                             <v-slide-y-transition group>
-                                <div
-                                    v-for="player in activeRoom?.users || []"
-                                    :key="player._id"
-                                    class="d-flex align-center pa-3 player-item"
-                                >
-                                    <v-avatar
-                                        :color="player._id === activeRoom?.owner ? 'warning' : 'primary'"
-                                        size="36"
-                                        class="mr-3"
-                                    >
+                                <div v-for="player in activeRoom?.users || []" :key="player._id" class="d-flex align-center pa-3 player-item">
+                                    <v-avatar :color="player._id === activeRoom?.owner ? 'warning' : 'primary'" size="36" class="mr-3">
                                         <v-icon icon="mdi-account" color="white" size="small"></v-icon>
                                     </v-avatar>
                                     <span class="text-body-2 font-weight-medium">{{ player.username }}</span>
-                                    <v-chip
-                                        v-if="player._id === activeRoom?.owner"
-                                        color="warning"
-                                        size="x-small"
-                                        variant="flat"
-                                        class="ml-3"
-                                        prepend-icon="mdi-crown"
-                                    >
-                                        Host
-                                    </v-chip>
+                                    <v-chip v-if="player._id === activeRoom?.owner" color="warning" size="x-small" variant="flat" class="ml-3" prepend-icon="mdi-crown"> Host </v-chip>
                                 </div>
                             </v-slide-y-transition>
                             <div v-if="!activeRoom?.users?.length" class="text-center pa-6 text-grey">
@@ -59,31 +42,12 @@
                             </div>
                         </template>
                         <v-card-text>
-                            <v-select
-                                v-model="selected"
-                                :items="tags"
-                                :item-props="itemProps"
-                                item-value="category"
-                                label="Select Categories"
-                                multiple
-                                persistent-hint
-                                hint="Choose trivia categories"
-                                clearable
-                                class="mb-4"
-                            ></v-select>
+                            <v-select v-model="selected" :items="tags" :item-props="itemProps" item-value="category" label="Select Categories" multiple persistent-hint hint="Choose trivia categories" clearable class="mb-4"></v-select>
 
                             <div class="mb-4">
                                 <div class="text-subtitle-2 font-weight-medium mb-2">Difficulty</div>
                                 <v-chip-group v-model="selectedDifficulties" multiple column>
-                                    <v-chip
-                                        v-for="difficulty in difficulties"
-                                        :key="difficulty"
-                                        :value="difficulty"
-                                        filter
-                                        variant="outlined"
-                                        color="primary"
-                                        class="checkboxDifficulty"
-                                    >
+                                    <v-chip v-for="difficulty in difficulties" :key="difficulty" :value="difficulty" filter variant="outlined" color="primary" class="checkboxDifficulty">
                                         {{ difficulty }}
                                     </v-chip>
                                 </v-chip-group>
@@ -94,20 +58,7 @@
                                     <v-icon icon="mdi-timer-outline" size="small" class="mr-1"></v-icon>
                                     Time per Question
                                 </div>
-                                <v-slider
-                                    id="sliderSeconds"
-                                    :min="5"
-                                    :max="30"
-                                    step="5"
-                                    v-model="selectedTime"
-                                    thumb-label="always"
-                                    show-ticks="always"
-                                    tick-size="4"
-                                    track-size="8"
-                                    color="primary"
-                                    track-color="surface-variant"
-                                    class="px-2"
-                                >
+                                <v-slider id="sliderSeconds" :min="5" :max="30" step="5" v-model="selectedTime" thumb-label="always" show-ticks="always" tick-size="4" track-size="8" color="primary" track-color="surface-variant" class="px-2">
                                     <template #thumb-label="{ modelValue }">
                                         <strong>{{ modelValue }}s</strong>
                                     </template>
@@ -119,37 +70,14 @@
                                     <v-icon icon="mdi-order-numeric" size="small" class="mr-1"></v-icon>
                                     Number of Questions
                                 </div>
-                                <v-slider
-                                    id="sliderNumber"
-                                    :min="3"
-                                    :max="15"
-                                    step="2"
-                                    v-model="selectedQuestions"
-                                    thumb-label="always"
-                                    show-ticks="always"
-                                    tick-size="4"
-                                    track-size="8"
-                                    color="accent"
-                                    track-color="surface-variant"
-                                    class="px-2"
-                                >
+                                <v-slider id="sliderNumber" :min="3" :max="15" step="2" v-model="selectedQuestions" thumb-label="always" show-ticks="always" tick-size="4" track-size="8" color="accent" track-color="surface-variant" class="px-2">
                                     <template #thumb-label="{ modelValue }">
                                         <strong>{{ modelValue }} Q</strong>
                                     </template>
                                 </v-slider>
                             </div>
 
-                            <v-btn
-                                name="startQuizzBtn"
-                                color="success"
-                                size="x-large"
-                                block
-                                @click="getQuizz()"
-                                prepend-icon="mdi-play-circle"
-                                :disabled="selected.length === 0"
-                            >
-                                Start Game!
-                            </v-btn>
+                            <v-btn name="startQuizzBtn" color="success" size="x-large" block @click="getQuizz()" prepend-icon="mdi-play-circle" :disabled="selected.length === 0"> Start Game! </v-btn>
                         </v-card-text>
                     </v-card>
 
@@ -315,6 +243,8 @@ export default {
 }
 
 @keyframes spin {
-    100% { transform: rotate(360deg); }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 </style>
