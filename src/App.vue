@@ -1,8 +1,10 @@
 <template>
     <v-app>
-        <v-main>
+        <v-main class="app-background">
             <Header />
-            <router-view></router-view>
+            <v-container fluid class="pa-6">
+                <router-view></router-view>
+            </v-container>
         </v-main>
     </v-app>
 </template>
@@ -33,3 +35,30 @@ export default defineComponent({
     },
 })
 </script>
+
+<style>
+.app-background {
+    background: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 50%, #16213E 100%);
+    min-height: 100vh;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1A2E;
+}
+::-webkit-scrollbar-thumb {
+    background: #6C63FF;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #5A52E0;
+}
+</style>

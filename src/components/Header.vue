@@ -1,18 +1,29 @@
 <template>
-    <v-row>
-        <v-col class="d-flex justify-end align-center bg-blue" cols="6">
-            <router-link class="mt-2" style="text-decoration: none; color: inherit" to="/">Trivia App</router-link>
-        </v-col>
-        <v-col class="d-flex justify-end align-center bg-blue" cols="6">
-            <div class="mt-2 mr-2" v-if="user.logged">
-                <v-icon icon="mdi-account"></v-icon> <span class="pl-2 pr-2">{{ user.logged.username }}</span>
-                <v-icon icon="mdi-logout" @click="logout()"></v-icon>
-            </div>
-            <div class="mt-2 mr-2" v-else>
-                <v-btn variant="text"><router-link style="text-decoration: none; color: inherit" to="/authentication">Login/Register</router-link></v-btn>
-            </div>
-        </v-col>
-    </v-row>
+    <v-app-bar flat density="compact" class="header-bar pa-2" height="64">
+        <router-link to="/" style="text-decoration: none; color: inherit" class="d-flex align-center">
+            <v-icon icon="mdi-lightning-bolt" color="primary" size="32" class="mr-2"></v-icon>
+            <span class="text-h5 font-weight-bold">
+                Trivia<span class="text-primary">Quest</span>
+            </span>
+        </router-link>
+
+        <v-spacer></v-spacer>
+
+        <div v-if="user.logged" class="d-flex align-center">
+            <v-avatar color="secondary" size="36" class="mr-3">
+                <span class="text-body-2 font-weight-medium white--text">{{ user.logged.username.charAt(0).toUpperCase() }}</span>
+            </v-avatar>
+            <span class="text-body-2 mr-4">{{ user.logged.username }}</span>
+            <v-btn icon variant="text" color="grey" @click="logout()" title="Logout">
+                <v-icon icon="mdi-logout"></v-icon>
+            </v-btn>
+        </div>
+        <div v-else>
+            <v-btn variant="tonal" color="primary" prepend-icon="mdi-account" to="/authentication" size="small">
+                Login / Register
+            </v-btn>
+        </div>
+    </v-app-bar>
 </template>
 
 <script lang="ts">
@@ -37,3 +48,11 @@ export default defineComponent({
     },
 })
 </script>
+
+<style scoped>
+.header-bar {
+    border-bottom: 1px solid rgba(108, 99, 255, 0.2) !important;
+    backdrop-filter: blur(12px);
+    background: rgba(15, 15, 26, 0.85) !important;
+}
+</style>
