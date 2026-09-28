@@ -8,7 +8,7 @@ export type Tag = {
 }
 
 export type Quizz = {
-    current: ?Question
+    current: Question | null
     activeIndex: number
     time: number
 }
@@ -29,7 +29,7 @@ export type roomState = {
     all: Array<Room>
     creating: boolean
     joining: boolean
-    active: ?Room
+    active: Room | null
     quizz: Quizz
 }
 
@@ -54,7 +54,7 @@ export type User = {
 }
 
 export type userState = {
-    logged: ?User
+    logged: User | null
     register: errorState
     login: errorState
 }

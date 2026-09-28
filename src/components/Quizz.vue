@@ -209,7 +209,7 @@ export default defineComponent({
                     // Start the question timer
                     this.countdownMs = this.room.active.time * 1000
                     this.countdownSeconds = this.room.active.time
-                    this._timerStart = Date.now()
+                    this.timerStart = Date.now()
                     this.startSmoothTimer()
                     this.$nextTick(() => {
                         this.vueCountdown?.start()
@@ -220,8 +220,8 @@ export default defineComponent({
     beforeUnmount() {
         socket.off('checked_answer')
         socket.off('next_question')
-        if (this._nextInterval) clearInterval(this._nextInterval as unknown as number)
-        if (this._rafId) cancelAnimationFrame(this._rafId)
+        if (this.nextInterval) clearInterval(this.nextInterval as unknown as number)
+        if (this.rafId) cancelAnimationFrame(this.rafId)
     },
     methods: {
         start() {
@@ -229,7 +229,7 @@ export default defineComponent({
                 this.countdownMs = this.room.active.time * 1000
                 this.countdownSeconds = this.room.active.time
                 this.ingame = true
-                this._timerStart = Date.now()
+                this.timerStart = Date.now()
                 this.startSmoothTimer()
                 this.$nextTick(() => {
                     this.vueCountdown?.start()
@@ -239,14 +239,14 @@ export default defineComponent({
         startSmoothTimer() {
             const tick = () => {
                 if (!this.ingame) return
-                const elapsed = Date.now() - this._timerStart
+                const elapsed = Date.now() - this.timerStart
                 const remaining = Math.max(0, this.countdownMs - elapsed)
                 this.countdownSeconds = remaining / 1000
                 if (remaining > 0) {
-                    this._rafId = requestAnimationFrame(tick)
+                    this.rafId = requestAnimationFrame(tick)
                 }
             }
-            this._rafId = requestAnimationFrame(tick)
+            this.rafId = requestAnimationFrame(tick)
         },
         onTimeUp() {
             this.countdownSeconds = 0
@@ -264,13 +264,13 @@ export default defineComponent({
             }
         },
         startNextCountdown() {
-            if (this._nextInterval) clearInterval(this._nextInterval as unknown as number)
+            if (this.nextInterval) clearInterval(this.nextInterval as unknown as number)
             this.nextCountdown = 5
             this.showingNextCountdown = true
-            this._nextInterval = setInterval(() => {
+            this.nextInterval = setInterval(() => {
                 this.nextCountdown--
                 if (this.nextCountdown <= 0) {
-                    clearInterval(this._nextInterval as unknown as number)
+                    clearInterval(this.nextInterval as unknown as number)
                 }
             }, 1000)
         },
@@ -315,9 +315,9 @@ export default defineComponent({
             nextCountdown: 5,
             showLeaderboard: false,
             leaderboard: [] as Array<{ _id: string; username: string; userScore: number }>,
-            _timerStart: 0,
-            _rafId: 0,
-            _nextInterval: null as unknown as ReturnType<typeof setInterval> | null,
+            timerStart: 0,
+            rafId: 0,
+            nextInterval: null as unknown as ReturnType<typeof setInterval> | null,
         }
     },
 })
