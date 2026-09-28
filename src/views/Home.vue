@@ -1,25 +1,59 @@
 <template>
-    <v-row class="justify-center align-start">
-        <v-col cols="4">
-            <v-card>
-                <v-card-title class="bg-grey d-flex align-center"><v-icon icon="mdi-crown"></v-icon><span class="pl-2">Host a room</span></v-card-title>
-                <v-form @submit.prevent="pushRoom()">
-                    <v-text-field name="hostRoomName" class="pa-4" v-model="roomName" label="Room Name"></v-text-field>
-                    <v-btn name="hostRoomSubmit" type="submit" block class="mt-1 bg-green w-75">Create</v-btn>
-                </v-form>
+    <v-row class="justify-center align-start" no-gutters>
+        <v-col cols="12" md="5" lg="4">
+            <v-card class="pa-2 mb-6">
+                <template #title>
+                    <div class="d-flex align-center">
+                        <v-icon icon="mdi-crown" color="warning" class="mr-2"></v-icon>
+                        <span class="text-h6 font-weight-bold">Host a Room</span>
+                    </div>
+                </template>
+                <v-card-text>
+                    <v-form @submit.prevent="pushRoom()">
+                        <v-text-field name="hostRoomName" v-model="roomName" label="Room Name" placeholder="Enter a fun room name..." clearable :rules="[(v) => !!v || 'Room name is required']"></v-text-field>
+                        <v-btn name="hostRoomSubmit" type="submit" block color="primary" size="large" :disabled="!roomName" prepend-icon="mdi-plus-circle"> Create Room </v-btn>
+                    </v-form>
+                </v-card-text>
             </v-card>
         </v-col>
-        <v-col cols="7">
-            <v-card>
-                <v-card-title class="bg-grey d-flex align-center"><v-icon icon="mdi-account-group"></v-icon><span class="pl-2">Join a room</span></v-card-title>
-                <div class="rooms" v-for="room in rooms" :key="room._id">
-                    <div class="pa-3">
-                        {{ room.name }} - {{ room.users.length }} users connected
-                        <div v-if="room.inGame">En jeu</div>
-                        <v-btn class="bg-green button-join-room" v-if="!room.inGame" @click="toRoom(room._id)">Join</v-btn>
+
+        <v-col cols="12" md="7" lg="6" class="pl-md-6">
+            <v-card class="pa-2">
+                <template #title>
+                    <div class="d-flex align-center">
+                        <v-icon icon="mdi-account-group" color="primary" class="mr-2"></v-icon>
+                        <span class="text-h6 font-weight-bold">Available Rooms</span>
+                        <v-chip variant="flat" color="surface-variant" size="small" class="ml-3"> {{ rooms.length }} room{{ rooms.length !== 1 ? 's' : '' }} </v-chip>
                     </div>
-                    <v-divider></v-divider>
-                </div>
+                </template>
+                <v-card-text>
+                    <div v-if="rooms.length === 0" class="text-center pa-8">
+                        <v-icon icon="mdi-gamepad-variant-outline" size="64" color="grey" class="mb-4"></v-icon>
+                        <div class="text-h6 text-grey">No rooms available</div>
+                        <div class="text-body-2 text-grey mt-1">Create one to get started!</div>
+                    </div>
+                    <div v-else>
+                        <v-slide-y-transition group>
+                            <v-card v-for="room in rooms" :key="room._id" variant="outlined" class="room-card mb-3" :class="{ 'room-inactive': room.inGame }">
+                                <div class="d-flex align-center pa-4">
+                                    <v-avatar :color="room.inGame ? 'grey' : 'primary'" size="40" class="mr-4">
+                                        <v-icon icon="mdi-gamepad-variant" color="white"></v-icon>
+                                    </v-avatar>
+                                    <div class="flex-grow-1">
+                                        <div class="text-subtitle-1 font-weight-medium">{{ room.name }}</div>
+                                        <div class="d-flex align-center mt-1">
+                                            <v-icon icon="mdi-account" size="small" color="grey" class="mr-1"></v-icon>
+                                            <span class="text-caption text-grey">{{ room.users.length }} player{{ room.users.length !== 1 ? 's' : '' }} connected</span>
+                                            <v-chip v-if="room.inGame" color="warning" size="x-small" class="ml-3" variant="flat"> In Game </v-chip>
+                                        </div>
+                                    </div>
+                                    <v-btn v-if="!room.inGame" class="button-join-room" color="success" variant="elevated" @click="toRoom(room._id)" prepend-icon="mdi-login"> Join </v-btn>
+                                    <v-btn v-else disabled variant="text" color="grey"> Spectate </v-btn>
+                                </div>
+                            </v-card>
+                        </v-slide-y-transition>
+                    </div>
+                </v-card-text>
             </v-card>
         </v-col>
     </v-row>
@@ -94,7 +128,7 @@ export default {
                         })
                         this.$router.push('/room/' + response.data._id)
                     })
-                    .catch((err) => {
+                    .catch((err: unknown) => {
                         console.log(err)
                     })
             }
@@ -121,18 +155,16 @@ export default {
                         })
                         this.$router.push('/room/' + roomId)
                     })
-                    .catch((error) => {
+                    .catch((error: unknown) => {
                         console.error('Error joining room:', error)
-                        // Handle the error appropriately
                     })
             }
 
             if (localStorage.getItem('token') === null) {
                 this.createGuestUser()
                     .then(joinRoomAndNavigate)
-                    .catch((error) => {
+                    .catch((error: unknown) => {
                         console.error('Error creating guest user:', error)
-                        // Handle the error appropriately
                     })
             } else {
                 joinRoomAndNavigate()
@@ -145,4 +177,20 @@ export default {
     }),
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.room-card {
+    transition: all 0.2s ease;
+    border-color: rgba(108, 99, 255, 0.2) !important;
+    &:hover {
+        border-color: rgba(108, 99, 255, 0.6) !important;
+        transform: translateX(4px);
+        box-shadow: 0 4px 20px rgba(108, 99, 255, 0.15);
+    }
+}
+.room-inactive {
+    opacity: 0.6;
+    &:hover {
+        transform: none;
+    }
+}
+</style>

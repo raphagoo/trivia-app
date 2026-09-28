@@ -1,36 +1,99 @@
 <template>
-    <v-container class="bg-grey h-100">
-        <v-row class="w-50 d-flex">
-            <v-col cols="12">
-                Liste des joueurs :
-                <div class="users-in-room" v-for="user in activeRoom.users" :key="user._id"><v-icon color="warning" icon="mdi-crown" v-if="user._id === activeRoom.owner"></v-icon>{{ user.username }}</div>
-            </v-col>
-        </v-row>
-        <v-row v-if="user.logged._id === activeRoom.owner && !ingame" class="w-75 d-flex">
-            <v-col cols="9">
-                <v-card class="ml-2">
-                    <v-card-title class="d-flex bg-blue">Create a quizz</v-card-title>
-                    <v-select class="mt-4 pl-5 pr-5" v-model="selected" :items="tags" :item-props="itemProps" item-value="category" label="Select categories" multiple persistent-hint></v-select>
-                    <div class="">
-                        <span class="text-subtitle-1 pl-5">Pick difficulties</span>
-                        <v-checkbox :disabled="user.logged._id !== activeRoom.owner" class="d-flex w-50 pl-5 checkboxDifficulty" :label="difficulty" v-for="difficulty in difficulties" v-model="selectedDifficulties" :value="difficulty" :key="difficulty"></v-checkbox>
-                    </div>
-                    <v-slider id="sliderSeconds" class="w-75 pl-5" label="Secondes par question" :min="5" :max="30" step="5" v-model="selectedTime" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
-                    <v-slider id="sliderNumber" class="w-75 pl-5" label="Nombre de questions" :min="3" :max="15" step="2" v-model="selectedQuestions" thumb-label="always" show-ticks="always" tick-size="2"></v-slider>
-                    <v-card-actions class="d-flex justify-center">
-                        <v-btn name="startQuizzBtn" class="bg-success mb-5" @click="getQuizz()">Start !</v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-col>
-        </v-row>
-        <v-row v-if="user.logged._id !== activeRoom.owner && !ingame">
-            <v-col cols="10">
-                <v-card class="ml-2">
-                    <v-card-title class="d-flex bg-blue">Host is setting the quizz...</v-card-title>
-                </v-card>
-            </v-col>
-        </v-row>
-        <v-row v-show="ingame">
+    <v-container fluid class="pa-4 h-100">
+        <!-- Lobby view (before game starts) -->
+        <template v-if="!ingame">
+            <v-row justify="center">
+                <v-col cols="12" md="4">
+                    <v-card class="pa-4">
+                        <template #title>
+                            <div class="d-flex align-center">
+                                <v-icon icon="mdi-account-group" color="primary" class="mr-2"></v-icon>
+                                <span class="text-h6 font-weight-bold">Players</span>
+                                <v-chip variant="flat" color="primary" size="small" class="ml-auto">
+                                    {{ activeRoom?.users?.length || 0 }}
+                                </v-chip>
+                            </div>
+                        </template>
+                        <v-card-text>
+                            <v-slide-y-transition group>
+                                <div v-for="player in activeRoom?.users || []" :key="player._id" class="d-flex align-center pa-3 player-item">
+                                    <v-avatar :color="player._id === activeRoom?.owner ? 'warning' : 'primary'" size="36" class="mr-3">
+                                        <v-icon icon="mdi-account" color="white" size="small"></v-icon>
+                                    </v-avatar>
+                                    <span class="text-body-2 font-weight-medium">{{ player.username }}</span>
+                                    <v-chip v-if="player._id === activeRoom?.owner" color="warning" size="x-small" variant="flat" class="ml-3" prepend-icon="mdi-crown"> Host </v-chip>
+                                </div>
+                            </v-slide-y-transition>
+                            <div v-if="!activeRoom?.users?.length" class="text-center pa-6 text-grey">
+                                <v-icon icon="mdi-account-off" size="48" class="mb-2"></v-icon>
+                                <div>Waiting for players...</div>
+                            </div>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+
+                <v-col cols="12" md="7">
+                    <!-- Host: quiz setup -->
+                    <v-card v-if="user.logged?._id === activeRoom?.owner" class="pa-2">
+                        <template #title>
+                            <div class="d-flex align-center">
+                                <v-icon icon="mdi-tune-vertical" color="accent" class="mr-2"></v-icon>
+                                <span class="text-h6 font-weight-bold">Quiz Settings</span>
+                            </div>
+                        </template>
+                        <v-card-text>
+                            <v-select v-model="selected" :items="tags" :item-props="itemProps" item-value="category" label="Select Categories" multiple persistent-hint hint="Choose trivia categories" clearable class="mb-4"></v-select>
+
+                            <div class="mb-4">
+                                <div class="text-subtitle-2 font-weight-medium mb-2">Difficulty</div>
+                                <v-chip-group v-model="selectedDifficulties" multiple column>
+                                    <v-chip v-for="difficulty in difficulties" :key="difficulty" :value="difficulty" filter variant="outlined" color="primary" class="checkboxDifficulty">
+                                        {{ difficulty }}
+                                    </v-chip>
+                                </v-chip-group>
+                            </div>
+
+                            <div class="mb-2">
+                                <div class="text-subtitle-2 font-weight-medium mb-1">
+                                    <v-icon icon="mdi-timer-outline" size="small" class="mr-1"></v-icon>
+                                    Time per Question
+                                </div>
+                                <v-slider id="sliderSeconds" :min="5" :max="30" step="5" v-model="selectedTime" thumb-label="always" show-ticks="always" tick-size="4" track-size="8" color="primary" track-color="surface-variant" class="px-2">
+                                    <template #thumb-label="{ modelValue }">
+                                        <strong>{{ modelValue }}s</strong>
+                                    </template>
+                                </v-slider>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="text-subtitle-2 font-weight-medium mb-1">
+                                    <v-icon icon="mdi-order-numeric" size="small" class="mr-1"></v-icon>
+                                    Number of Questions
+                                </div>
+                                <v-slider id="sliderNumber" :min="3" :max="15" step="2" v-model="selectedQuestions" thumb-label="always" show-ticks="always" tick-size="4" track-size="8" color="accent" track-color="surface-variant" class="px-2">
+                                    <template #thumb-label="{ modelValue }">
+                                        <strong>{{ modelValue }} Q</strong>
+                                    </template>
+                                </v-slider>
+                            </div>
+
+                            <v-btn name="startQuizzBtn" color="success" size="x-large" block @click="getQuizz()" prepend-icon="mdi-play-circle" :disabled="selected.length === 0"> Start Game! </v-btn>
+                        </v-card-text>
+                    </v-card>
+
+                    <!-- Non-host: waiting screen -->
+                    <v-card v-else class="pa-6 text-center">
+                        <v-icon icon="mdi-loading" size="64" color="primary" class="mb-4 spinning-icon"></v-icon>
+                        <div class="text-h5 font-weight-bold mb-2">Waiting for Host...</div>
+                        <div class="text-body-1 text-grey">The host is setting up the quiz. Hang tight!</div>
+                        <v-progress-linear indeterminate color="primary" class="mt-6"></v-progress-linear>
+                    </v-card>
+                </v-col>
+            </v-row>
+        </template>
+
+        <!-- Game view -->
+        <v-row v-show="ingame" justify="center">
             <v-col cols="12">
                 <Quizz ref="quizzComponent"></Quizz>
             </v-col>
@@ -162,8 +225,26 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.h-90 {
-    height: 95%;
+<style lang="scss" scoped>
+.player-item {
+    border-bottom: 1px solid rgba(108, 99, 255, 0.1);
+    transition: background 0.2s;
+    border-radius: 8px;
+    &:hover {
+        background: rgba(108, 99, 255, 0.05);
+    }
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.spinning-icon {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
 }
 </style>
