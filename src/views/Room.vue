@@ -16,13 +16,13 @@
                         </template>
                         <v-card-text>
                             <v-slide-y-transition group>
-                                <div v-for="player in activeRoom?.users || []" :key="player._id" class="d-flex align-center pa-3 player-item">
+                                <router-link v-for="player in activeRoom?.users || []" :key="player._id" :to="'/profile/' + player._id" class="d-flex align-center pa-3 player-item">
                                     <v-avatar :color="player._id === activeRoom?.owner ? 'warning' : 'primary'" size="36" class="mr-3">
                                         <v-icon icon="mdi-account" color="white" size="small"></v-icon>
                                     </v-avatar>
                                     <span class="text-body-2 font-weight-medium">{{ player.username }}</span>
                                     <v-chip v-if="player._id === activeRoom?.owner" color="warning" size="x-small" variant="flat" class="ml-3" prepend-icon="mdi-crown"> Host </v-chip>
-                                </div>
+                                </router-link>
                             </v-slide-y-transition>
                             <div v-if="!activeRoom?.users?.length" class="text-center pa-6 text-grey">
                                 <v-icon icon="mdi-account-off" size="48" class="mb-2"></v-icon>
@@ -98,6 +98,8 @@
                 <Quizz ref="quizzComponent"></Quizz>
             </v-col>
         </v-row>
+
+        <Chat></Chat>
     </v-container>
 </template>
 
@@ -107,12 +109,14 @@ import { mapActions, mapState } from 'vuex'
 import { useRoute } from 'vue-router'
 import { socket } from '../socket'
 import Quizz from '../components/Quizz.vue'
+import Chat from '../components/Chat.vue'
 import { Tag, Room } from '../types/index'
 
 export default {
     name: 'room',
     components: {
         Quizz,
+        Chat,
     },
     setup() {
         //code obligatoire pour init des child components
@@ -230,6 +234,8 @@ export default {
     border-bottom: 1px solid rgba(108, 99, 255, 0.1);
     transition: background 0.2s;
     border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
     &:hover {
         background: rgba(108, 99, 255, 0.05);
     }

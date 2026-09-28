@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from './views/Home.vue'
 import Room from './views/Room.vue'
 import Authentication from './views/Authentication.vue'
+import Profile from './views/Profile.vue'
 
 export const router = createRouter({
     history: createWebHistory(),
@@ -21,6 +22,11 @@ export const router = createRouter({
             path: '/room/:roomId',
             name: 'room',
             component: Room,
+        },
+        {
+            path: '/profile/:id?',
+            name: 'profile',
+            component: Profile,
         },
         {
             path: '/:pathMatch(.*)*',

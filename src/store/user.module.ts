@@ -2,10 +2,10 @@ import { Commit } from 'vuex'
 import { AxiosResponse } from 'axios'
 import api from '../interfaces/apiInterface'
 import consoleLogger from '../interfaces/consoleLogger'
-import { userState } from '../types'
+import { userState, User } from '../types'
 import { router } from '../router'
 
-const state: userState = { logged: null, register: { message: '', error: false }, login: { message: '', error: false } }
+const state: userState = { logged: null, profile: null, register: { message: '', error: false }, login: { message: '', error: false } }
 
 const actions = {
     register({ commit }: { commit: Commit }, user: { name: string; password: string }) {
@@ -50,6 +50,20 @@ const actions = {
     },
     logout({ commit }: { commit: Commit }) {
         commit('logout')
+    },
+    getProfile({ commit }: { commit: Commit }, userId: string) {
+        return new Promise(function (resolve, reject) {
+            commit('getProfileRequest')
+            api.get('/user/' + userId, { headers: { Accept: 'application/json' } })
+                .then((response) => {
+                    commit('getProfileSuccess', response.data)
+                    resolve(response.data)
+                })
+                .catch((error) => {
+                    commit('getProfileError', error)
+                    reject(error)
+                })
+        })
     },
 }
 
@@ -104,6 +118,16 @@ const mutations = {
             localStorage.removeItem('token')
             localStorage.removeItem('refreshToken')
         })
+    },
+    getProfileRequest(state: userState) {
+        state.profile = null
+    },
+    getProfileSuccess(state: userState, data: User) {
+        state.profile = data
+    },
+    getProfileError(state: userState, error: AxiosResponse) {
+        state.profile = null
+        consoleLogger.error(error)
     },
 }
 

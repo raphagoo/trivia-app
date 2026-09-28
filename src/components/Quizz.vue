@@ -92,9 +92,10 @@
                     </template>
                     <v-card-text class="pa-0">
                         <v-slide-y-transition group>
-                            <div
+                            <router-link
                                 v-for="(player, index) in leaderboard"
                                 :key="player._id"
+                                :to="'/profile/' + player._id"
                                 class="leaderboard-row d-flex align-center pa-4"
                                 :class="{
                                     'rank-gold': index === 0,
@@ -119,7 +120,7 @@
                                     </div>
                                 </div>
                                 <div class="text-h5 font-weight-bold" :class="'rank-score-' + (index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'normal')">{{ player.userScore || 0 }} <span class="text-caption font-weight-regular">pts</span></div>
-                            </div>
+                            </router-link>
                         </v-slide-y-transition>
                     </v-card-text>
                     <v-card-actions class="justify-center pt-6">
@@ -382,6 +383,8 @@ export default defineComponent({
     border-radius: 12px;
     margin-bottom: 4px;
     transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
 }
 .leaderboard-row:last-child {
     border-bottom: none;
