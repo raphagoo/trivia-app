@@ -51,10 +51,26 @@ export type User = {
     username: string
     password: string
     userScore: number
+    stats?: UserStats
+}
+
+export type UserStats = {
+    gamesPlayed: number
+    totalScore: number
+    correctAnswers: number
+    totalAnswers: number
+}
+
+export type ChatMessage = {
+    room: string
+    user: User
+    message: string
+    timestamp: number
 }
 
 export type userState = {
     logged: ?User
+    profile: ?User
     register: errorState
     login: errorState
 }

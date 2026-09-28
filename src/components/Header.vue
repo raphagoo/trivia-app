@@ -8,10 +8,12 @@
         <v-spacer></v-spacer>
 
         <div v-if="user.logged" class="d-flex align-center">
-            <v-avatar color="secondary" size="36" class="mr-3">
-                <span class="text-body-2 font-weight-medium white--text">{{ user.logged.username.charAt(0).toUpperCase() }}</span>
-            </v-avatar>
-            <span class="text-body-2 mr-4">{{ user.logged.username }}</span>
+            <router-link to="/profile" class="d-flex align-center profile-link mr-4">
+                <v-avatar color="secondary" size="36" class="mr-3">
+                    <span class="text-body-2 font-weight-medium white--text">{{ user.logged.username.charAt(0).toUpperCase() }}</span>
+                </v-avatar>
+                <span class="text-body-2">{{ user.logged.username }}</span>
+            </router-link>
             <v-btn icon variant="text" color="grey" @click="logout()" title="Logout">
                 <v-icon icon="mdi-logout"></v-icon>
             </v-btn>
@@ -46,6 +48,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.profile-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 .header-bar {
     border-bottom: 1px solid rgba(108, 99, 255, 0.2) !important;
     backdrop-filter: blur(12px);
