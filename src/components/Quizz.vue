@@ -222,7 +222,7 @@ export default defineComponent({
         socket.off('checked_answer')
         socket.off('next_question')
         if (this._nextInterval) clearInterval(this._nextInterval as unknown as number)
-        if (this._rafId) cancelAnimationFrame(this._rafId)
+        if (this._tickInterval) clearInterval(this._tickInterval as unknown as number)
     },
     methods: {
         start() {
@@ -238,19 +238,29 @@ export default defineComponent({
             })
         },
         startSmoothTimer() {
+            // requestAnimationFrame is fully paused (not just throttled) while the tab
+            // is hidden/backgrounded, e.g. when the user has another tab focused. Since
+            // that's exactly when a countdown needs to keep running, drive it with
+            // setInterval instead — Chrome only throttles that, it never suspends it —
+            // and compute remaining time from wall-clock deltas so it self-corrects
+            // regardless of how delayed an individual tick was.
+            if (this._tickInterval) clearInterval(this._tickInterval as unknown as number)
             const tick = () => {
                 if (!this.ingame) return
                 const elapsed = Date.now() - this._timerStart
                 const remaining = Math.max(0, this.countdownMs - elapsed)
                 this.countdownSeconds = remaining / 1000
-                if (remaining > 0) {
-                    this._rafId = requestAnimationFrame(tick)
+                if (remaining <= 0) {
+                    clearInterval(this._tickInterval as unknown as number)
+                    this.onTimeUp()
                 }
             }
-            this._rafId = requestAnimationFrame(tick)
+            this._tickInterval = setInterval(tick, 100)
         },
         onTimeUp() {
+            if (!this.ingame || this.showResult) return
             this.countdownSeconds = 0
+            if (this._tickInterval) clearInterval(this._tickInterval as unknown as number)
             this.verifyAnswer()
         },
         verifyAnswer() {
@@ -317,7 +327,7 @@ export default defineComponent({
             showLeaderboard: false,
             leaderboard: [] as Array<{ _id: string; username: string; userScore: number }>,
             _timerStart: 0,
-            _rafId: 0,
+            _tickInterval: null as unknown as ReturnType<typeof setInterval> | null,
             _nextInterval: null as unknown as ReturnType<typeof setInterval> | null,
         }
     },
