@@ -130,6 +130,16 @@ export default {
         sendLogin() {
             this.login(this.loginForm)
         },
+        secureRandomInt(max: number) {
+            const array = new Uint32Array(1)
+            const limit = Math.floor(0xffffffff / max) * max
+            let value
+            do {
+                crypto.getRandomValues(array)
+                value = array[0]
+            } while (value >= limit)
+            return value % max
+        },
         generatePassword() {
             const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             const lower = 'abcdefghijklmnopqrstuvwxyz'
@@ -139,20 +149,20 @@ export default {
 
             // Ensure at least one character from each category
             let pwd = ''
-            pwd += upper[Math.floor(Math.random() * upper.length)]
-            pwd += lower[Math.floor(Math.random() * lower.length)]
-            pwd += digits[Math.floor(Math.random() * digits.length)]
-            pwd += special[Math.floor(Math.random() * special.length)]
+            pwd += upper[this.secureRandomInt(upper.length)]
+            pwd += lower[this.secureRandomInt(lower.length)]
+            pwd += digits[this.secureRandomInt(digits.length)]
+            pwd += special[this.secureRandomInt(special.length)]
 
             // Fill remaining to reach 16 characters
             for (let i = pwd.length; i < 16; i++) {
-                pwd += all[Math.floor(Math.random() * all.length)]
+                pwd += all[this.secureRandomInt(all.length)]
             }
 
             // Shuffle using Fisher-Yates
             const arr = pwd.split('')
             for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1))
+                const j = this.secureRandomInt(i + 1)
                 ;[arr[i], arr[j]] = [arr[j], arr[i]]
             }
 

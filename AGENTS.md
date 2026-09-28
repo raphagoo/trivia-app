@@ -94,6 +94,6 @@ npm run test-interactive  # Cypress interactive mode
 
 ## Known Constraints
 
-- Peer dep conflict between `typescript@^7.0.2` and `@typescript-eslint/*@^8.63.0` (requires `<6.1.0`). Fixed via `legacy-peer-deps=true` in `.npmrc`.
+- `typescript@^7.0.2` is incompatible with `@typescript-eslint/*` (peer range `<6.1.0`, no compatible or canary build exists as of 2026-09). This is not just a peer-dep warning: TS7's package only exports `version`/`versionMajorMinor` from its main entry, so the legacy TS Compiler API that `typescript-estree` depends on (`ts.Extension`, `ts.createProgram`, etc.) is gone, and `@typescript-eslint/parser`/`eslint-plugin` crash on load. **`npm run lint` is currently broken** and the `build (20.x)` CI check fails on its Lint step. `vue-tsc --noEmit` also fails on TS7 (unrelated `ERR_PACKAGE_PATH_NOT_EXPORTED` on `typescript/lib/tsc`), though it isn't wired into any npm script or CI check. Fixing this requires either downgrading `typescript` below `6.1.0` or waiting for upstream `@typescript-eslint` support for TS7. `legacy-peer-deps=true` in `.npmrc` only suppresses the install-time warning, it does not make the tools work together.
 - `vue-socket.io-extended` is on an alpha release (`5.0.0-alpha.5`); the stable `latest` tag is a lower version (`4.2.0`).
 - Backend API expected at `VITE_NODE_API_URL` env var, trivia API at `VITE_TRIVIA_API_URL`.
